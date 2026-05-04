@@ -4257,7 +4257,9 @@
      ============================================================= */
 
   const STORAGE_FILTER = "lvr_onboarding_filter_v2";
-  const APP_PASSWORD = "Tud0V4idarC3rto*";
+  // Credenciais do usuário compartilhado (auth via Supabase Auth)
+  // O email é interno, não precisa ser real — só serve pra dar entrada no Supabase Auth.
+  const APP_USER_EMAIL = "lavieenrose@lvr.local";
   const SUPABASE_URL = "https://odijbzgdewzkbuvrusoj.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kaWpiemdkZXd6a2J1dnJ1c29qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MDUwODYsImV4cCI6MjA5MzM4MTA4Nn0.-U_zO_QBmzOa8Av0wDvbu5Vy1AkxSweooxV6yT1-Ht8";
 
@@ -5424,9 +5426,7 @@
 
   // Boot — agora passa por login antes de carregar
   async function boot() {
-    // Cria cliente Supabase
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+    // Cliente Supabase já foi criado no carregamento da página (vide bloco LOGIN abaixo)
     // Carrega dados do servidor
     try {
       await loadStateFromRemote();
@@ -5560,32 +5560,43 @@
   const loginBtn = document.getElementById("loginBtn");
   const loginError = document.getElementById("loginError");
 
-  // Sessão local (não precisa logar de novo no mesmo navegador por 30 dias)
-  const SESSION_KEY = "lvr_session_v1";
-  const SESSION_TTL = 30 * 24 * 60 * 60 * 1000; // 30 dias
-
-  function checkSession() {
-    try {
-      const raw = localStorage.getItem(SESSION_KEY);
-      if (!raw) return false;
-      const { ts } = JSON.parse(raw);
-      return ts && (Date.now() - ts) < SESSION_TTL;
-    } catch { return false; }
-  }
-
-  function saveSession() {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ ts: Date.now() }));
-  }
+  // Cria o cliente Supabase já no carregamento — ele gerencia a própria sessão
+  // (persistida em localStorage automaticamente pela lib).
+  // O cliente sb (declarado mais acima) é reutilizado pelo resto do código.
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      storageKey: "lvr_auth_v1"
+    }
+  });
 
   async function attemptLogin() {
-    const value = loginInput.value;
-    if (value === APP_PASSWORD) {
-      saveSession();
-      await unlock();
-    } else {
-      loginError.textContent = "Senha incorreta.";
-      loginInput.value = "";
+    const password = loginInput.value;
+    if (!password) {
+      loginError.textContent = "Digite a senha.";
       loginInput.focus();
+      return;
+    }
+    loginBtn.disabled = true;
+    loginError.textContent = "Verificando...";
+    try {
+      const { error } = await sb.auth.signInWithPassword({
+        email: APP_USER_EMAIL,
+        password: password
+      });
+      if (error) {
+        loginError.textContent = "Senha incorreta.";
+        loginInput.value = "";
+        loginInput.focus();
+        loginBtn.disabled = false;
+        return;
+      }
+      await unlock();
+    } catch (err) {
+      console.error("Erro de login:", err);
+      loginError.textContent = "Erro de conexão. Tente novamente.";
+      loginBtn.disabled = false;
     }
   }
 
@@ -5602,10 +5613,13 @@
     if (e.key === "Enter") attemptLogin();
   });
 
-  // Auto-unlock se sessão válida
-  if (checkSession()) {
-    unlock();
-  }
+  // Auto-unlock se já existe sessão válida (token salvo pelo Supabase)
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await unlock();
+    }
+  })();
 </script>
 </body>
 </html>
