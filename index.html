@@ -1450,7 +1450,12 @@
     padding: 1.4rem 0 6rem;
     transform: translateX(0);
     transition: transform 0.3s ease;
+    /* Move a scrollbar para o lado esquerdo do sidebar.
+       direction: rtl no container vira a barra de rolagem;
+       direction: ltr no inner restaura a leitura normal do conteúdo. */
+    direction: rtl;
   }
+  .sidebar > * { direction: ltr; }
   .sidebar::-webkit-scrollbar { width: 6px; }
   .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   .sidebar::-webkit-scrollbar-track { background: transparent; }
@@ -2019,26 +2024,36 @@
 
   /* Camada 1 (body::before): blobs orgânicos #19262D animados como névoa.
      Usa múltiplos radial-gradients posicionados via custom properties
-     que mudam com keyframes — efeito de névoa flutuando. */
+     que mudam com keyframes — efeito de névoa flutuando.
+     IMPORTANTE: position/inset/content são re-declarados aqui pra garantir
+     que os blobs fiquem fixed acima da imagem de fundo do body. */
   body::before {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    pointer-events: none !important;
     background:
       radial-gradient(ellipse 55% 40% at var(--blob1-x, 18%) var(--blob1-y, 28%), rgba(25, 38, 45, 0.55), rgba(25, 38, 45, 0.25) 45%, transparent 75%),
       radial-gradient(ellipse 50% 50% at var(--blob2-x, 78%) var(--blob2-y, 62%), rgba(25, 38, 45, 0.5), rgba(25, 38, 45, 0.22) 45%, transparent 75%),
       radial-gradient(ellipse 65% 35% at var(--blob3-x, 48%) var(--blob3-y, 88%), rgba(25, 38, 45, 0.45), rgba(25, 38, 45, 0.18) 50%, transparent 78%),
       radial-gradient(ellipse 45% 55% at var(--blob4-x, 92%) var(--blob4-y, 12%), rgba(25, 38, 45, 0.42), rgba(25, 38, 45, 0.16) 50%, transparent 78%),
       linear-gradient(180deg, rgba(25, 38, 45, 0.25), rgba(25, 38, 45, 0.4)) !important;
-    animation: fog-drift 45s ease-in-out infinite alternate;
-    z-index: 0;
+    animation: fog-drift 45s ease-in-out infinite alternate !important;
+    z-index: 1 !important;
   }
 
   /* Camada 2 (body::after): toques residuais de luz dourada/azul */
   body::after {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    pointer-events: none !important;
     background:
       radial-gradient(ellipse 600px 400px at 80% 20%, rgba(200, 151, 90, 0.05), transparent 60%),
       radial-gradient(ellipse 500px 300px at 15% 80%, rgba(70, 98, 112, 0.08), transparent 60%) !important;
     opacity: 1 !important;
     mix-blend-mode: normal !important;
-    z-index: 1;
+    z-index: 2 !important;
   }
 
   /* Animação dos blobs: cada um se desloca por trajetórias diferentes */
@@ -2086,8 +2101,8 @@
   @property --blob4-x { syntax: "<percentage>"; inherits: false; initial-value: 92%; }
   @property --blob4-y { syntax: "<percentage>"; inherits: false; initial-value: 12%; }
 
-  /* Garante z-index correto: imagem (0) → blobs (0) → main (2) → sidebar (50) → toolbar (100) */
-  main { z-index: 2; }
+  /* Garante z-index correto: imagem do body (0) → blobs (1) → luz (2) → main (3) → sidebar (50) → toolbar (100) */
+  main { z-index: 3 !important; position: relative !important; }
 
   /* Mobile: anima mais devagar (economia de bateria) */
   @media (max-width: 768px) {
