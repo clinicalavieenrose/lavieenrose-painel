@@ -2532,66 +2532,106 @@
   }
 
   /* ============================================================
-     CORREÇÕES FINAIS — 5 ajustes
+     CORREÇÕES FINAIS — versão limpa
      ============================================================ */
 
-  /* (1) Scrollbar do sidebar não pode passar do border-radius */
+  /* ─────────────────────────────────────────
+     SIDEBAR — scrollbar contida via wrapper interno
+     Solução robusta: o <aside class="sidebar"> tem overflow:hidden
+     com border-radius (corta tudo nos cantos arredondados).
+     O <div class="sidebar-inner"> dentro dele tem overflow-y:auto
+     SEM border-radius — a scrollbar é renderizada nele e fica
+     naturalmente dentro da área já cortada.
+     ───────────────────────────────────────── */
   .sidebar {
-    /* Cria um inset para o scrollbar nascer dentro da borda arredondada */
-    padding-right: 4px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    /* Sem mask-image — não precisa mais */
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
   }
-  .sidebar::-webkit-scrollbar {
-    width: 5px !important;
-  }
-  .sidebar::-webkit-scrollbar-track {
-    background: transparent !important;
-    margin: 16px 0 !important;
-  }
-  .sidebar::-webkit-scrollbar-thumb {
-    background: rgba(232, 221, 200, 0.15) !important;
-    border-radius: 10px !important;
-  }
-  .sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(232, 221, 200, 0.3) !important;
-  }
-  /* Firefox */
-  .sidebar {
-    scrollbar-width: thin !important;
-    scrollbar-color: rgba(232, 221, 200, 0.15) transparent !important;
+  .sidebar-inner {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1.4rem 0 6rem;
   }
 
-  /* (2) Espaço para os botões de ferramentas saírem do box da tarefa */
+  /* Scrollbar customizada no wrapper interno */
+  .sidebar-inner::-webkit-scrollbar {
+    width: 4px;
+  }
+  .sidebar-inner::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .sidebar-inner::-webkit-scrollbar-thumb {
+    background: rgba(232, 221, 200, 0);
+    border-radius: 10px;
+    transition: background 0.3s;
+  }
+  .sidebar:hover .sidebar-inner::-webkit-scrollbar-thumb {
+    background: rgba(232, 221, 200, 0.22);
+  }
+  .sidebar-inner {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(232, 221, 200, 0.12) transparent;
+  }
+
+  /* Reativa o reflexo de luz no topo do sidebar (reflexo glass) */
+  .sidebar::before {
+    display: block !important;
+  }
+
+  /* ─────────────────────────────────────────
+     MICROTAREFAS — fundo glass garantido + padding pros botões
+     Reescrito limpo, sobrescrevendo TODAS as regras anteriores.
+     ───────────────────────────────────────── */
   .checklist li {
-    /* Reduz a largura efetiva pra criar uma "rua" externa pros botões.
-       Os botões (.task-actions) que estavam absolute dentro vão sair pra fora. */
-    margin-right: 130px !important;
-    padding-right: 1rem !important;
+    /* Visibilidade garantida — opacity 1 em todos os estados base */
+    opacity: 1 !important;
+    display: list-item !important;
+    visibility: visible !important;
+
+    /* Glass background visível */
+    background: rgba(31, 47, 55, 0.55) !important;
+    backdrop-filter: blur(14px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.14) !important;
+    border-radius: 12px !important;
+
+    /* Layout: padding generoso à esquerda (checkmark) e à direita (botões) */
+    padding: 0.85rem 220px 0.85rem 2.2rem !important;
+    margin: 0 0 0.5rem 0 !important;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 2px 10px rgba(0, 0, 0, 0.12) !important;
+
+    position: relative !important;
     overflow: visible !important;
+    cursor: pointer !important;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s !important;
   }
-  .task-actions {
+  .checklist li:hover {
+    background: rgba(31, 47, 55, 0.7) !important;
+    border-color: rgba(232, 221, 200, 0.22) !important;
+  }
+  /* Checkmark da tarefa */
+  .checklist li::before {
+    content: "✓" !important;
     position: absolute !important;
-    right: -120px !important;
-    top: 0.7rem !important;
-    display: flex !important;
-    gap: 6px !important;
-    align-items: center !important;
-    flex-wrap: nowrap !important;
-  }
-  /* Em telas estreitas, volta os botões pra dentro */
-  @media (max-width: 900px) {
-    .checklist li {
-      margin-right: 0 !important;
-    }
-    .task-actions {
-      position: static !important;
-      right: auto !important;
-      top: auto !important;
-      margin-top: 0.5rem !important;
-      flex-wrap: wrap !important;
-    }
+    left: 0.85rem !important;
+    top: 0.85rem !important;
+    color: var(--gold-dim) !important;
+    font-size: 0.85rem !important;
+    font-family: var(--font-mono) !important;
+    transition: color 0.2s !important;
   }
 
-  /* (3) HOVER OURO MUITO MAIS FORTE — matar opacity 0.42 herdada */
+  /* ─────────────────────────────────────────
+     TAREFAS CONCLUÍDAS — base dourada visível + hover dramático
+     ───────────────────────────────────────── */
   .checklist li.done {
     opacity: 1 !important;
     background: rgba(201, 138, 66, 0.22) !important;
@@ -2606,6 +2646,10 @@
   .checklist li.done .task-meta {
     color: rgba(240, 200, 122, 0.85) !important;
     opacity: 1 !important;
+  }
+  .checklist li.done::before {
+    content: "■" !important;
+    color: var(--gold) !important;
   }
   .checklist li.done:hover {
     background: rgba(201, 138, 66, 0.55) !important;
@@ -2627,7 +2671,91 @@
     color: #ffe5a8 !important;
   }
 
-  /* (4) REMOVER BOXES DAS FASES E STEPS — texto solto, sem container */
+  /* ─────────────────────────────────────────
+     BOTÕES DA TAREFA — linha horizontal compacta, sempre visíveis
+     Layout: avatar · prioridade · comentário · prazo (flat horizontal)
+     ───────────────────────────────────────── */
+  .task-actions {
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .assignee-badge,
+  .priority-btn,
+  .comment-btn {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 !important;
+    padding: 0 !important;
+    font-size: 0.68rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    /* Glass leve em cada botão (em vez de container envolvente) */
+    background: rgba(31, 47, 55, 0.5) !important;
+    backdrop-filter: blur(8px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.16) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    transition: background 0.15s, border-color 0.15s !important;
+  }
+  .assignee-badge:hover,
+  .priority-btn:hover,
+  .comment-btn:hover {
+    background: rgba(31, 47, 55, 0.85) !important;
+    border-color: rgba(232, 221, 200, 0.3) !important;
+  }
+  .deadline-btn {
+    height: 24px !important;
+    padding: 0 0.6rem !important;
+    border-radius: 12px !important;
+    font-size: 0.64rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    background: rgba(31, 47, 55, 0.5) !important;
+    backdrop-filter: blur(8px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.16) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  }
+  .deadline-btn:hover {
+    background: rgba(31, 47, 55, 0.85) !important;
+    border-color: rgba(232, 221, 200, 0.3) !important;
+  }
+
+  /* Em telas estreitas, botões viram linha embaixo do texto */
+  @media (max-width: 1100px) {
+    .checklist li {
+      padding-right: 1rem !important;
+    }
+    .task-actions {
+      position: static !important;
+      transform: none !important;
+      margin-top: 0.6rem !important;
+      flex-wrap: wrap !important;
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     REMOVER BOXES DAS FASES E STEPS — texto solto, sem container
+     ───────────────────────────────────────── */
   .phase-block::before {
     display: none !important;
   }
@@ -2641,24 +2769,82 @@
     padding: 1.5rem 0 !important;
   }
 
-  /* (5) HEADER STICKY — toolbar vira faixa horizontal no topo */
+  /* ─────────────────────────────────────────
+     TOOLBAR — header sticky horizontal full width
+     Forçar largura via width:auto + left+right (em vez de só left)
+     ───────────────────────────────────────── */
   .toolbar {
-    /* Reposiciona: era canto inferior, agora topo full width */
-    top: var(--sidebar-margin) !important;
+    /* Ilha flutuante — largura pelo conteúdo, alinhada à direita */
+    position: fixed !important;
+    top: 18px !important;
     bottom: auto !important;
-    right: var(--sidebar-margin) !important;
-    left: calc(var(--sidebar-width) + var(--sidebar-margin)) !important;
-    height: 60px !important;
+    left: auto !important;
+    right: 18px !important;
+    width: auto !important;
+    max-width: calc(100vw - var(--sidebar-width) - var(--sidebar-margin) * 2 - 16px) !important;
     min-width: 0 !important;
+
+    /* Layout horizontal */
+    height: 56px !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 1rem !important;
+    gap: 0.8rem !important;
     padding: 0 1.4rem !important;
-    border-radius: 18px !important;
+    margin: 0 !important;
+
+    /* Glass intensificado pra ilha (matching sidebar) */
+    background: rgba(13, 21, 25, 0.55) !important;
+    backdrop-filter: blur(24px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.28) !important;
+    border-radius: 22px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 20px 60px rgba(0, 0, 0, 0.55),
+      0 8px 24px rgba(0, 0, 0, 0.35),
+      0 2px 8px rgba(0, 0, 0, 0.2) !important;
     overflow: hidden !important;
   }
+  /* Reflexo de luz no topo (estilo glass Apple) */
+  .toolbar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+    pointer-events: none;
+    border-radius: 20px 20px 0 0;
+  }
 
-  /* Reorganiza partes internas da toolbar pra layout horizontal */
+  /* Sobrescreve o max-height: 0 da definição original */
+  .toolbar-actions {
+    max-height: none !important;
+    overflow: visible !important;
+    border-top: none !important;
+    display: flex !important;
+    flex-shrink: 0 !important;
+    gap: 0.4rem !important;
+    padding: 0 !important;
+    align-items: center !important;
+  }
+  .toolbar-action {
+    width: auto !important;
+    border-bottom: none !important;
+    padding: 0.4rem 0.7rem !important;
+    font-size: 0.65rem !important;
+    white-space: nowrap !important;
+    border-radius: 6px !important;
+    background: rgba(13, 21, 25, 0.3) !important;
+  }
+  .toolbar-action:hover {
+    background: rgba(13, 21, 25, 0.6) !important;
+  }
+  .toolbar-action .arrow {
+    margin-left: 0.3rem !important;
+  }
+
   .toolbar-summary {
     flex-shrink: 0 !important;
     display: flex !important;
@@ -2674,48 +2860,38 @@
     gap: 0.5rem !important;
   }
   .toolbar-label {
-    font-size: 0.62rem !important;
+    font-size: 0.6rem !important;
     margin-bottom: 0 !important;
     white-space: nowrap !important;
   }
   .toolbar-counter {
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
   }
-  .toolbar-progress {
+  .toolbar-progress { display: none !important; }
+  .toolbar-summary > span:last-child,
+  .toolbar-summary svg {
     display: none !important;
-  }
-  .toolbar-toggle,
-  .toolbar-summary svg,
-  .toolbar-summary .arrow {
-    display: none !important;
-  }
-  /* Separadores verticais entre as 3 zonas do header */
-  .toolbar-summary::after {
-    content: "";
-    width: 1px;
-    height: 24px;
-    background: var(--glass-border);
-    margin-left: 1rem;
   }
 
-  .toolbar-filters,
+  /* Filter rows */
   .filter-row {
     display: flex !important;
     flex: 0 1 auto !important;
     border: none !important;
-    border-radius: 10px !important;
+    border-top: none !important;
+    border-radius: 8px !important;
     overflow: hidden !important;
-    height: 36px !important;
+    height: 32px !important;
     background: rgba(13, 21, 25, 0.4) !important;
     margin: 0 !important;
   }
   .filter-btn {
     flex: 1 !important;
     padding: 0 0.7rem !important;
-    border-right: 1px solid var(--glass-border) !important;
-    font-size: 0.68rem !important;
+    border-right: 1px solid rgba(232, 221, 200, 0.12) !important;
+    font-size: 0.6rem !important;
     white-space: nowrap !important;
-    height: 36px !important;
+    height: 32px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -2724,48 +2900,30 @@
     border-right: none !important;
   }
 
-  .toolbar-actions {
-    display: flex !important;
-    flex-shrink: 0 !important;
-    gap: 0.5rem !important;
-    border-top: none !important;
-    padding: 0 !important;
-  }
-  .toolbar-action {
-    padding: 0.5rem 0.8rem !important;
-    font-size: 0.7rem !important;
-    white-space: nowrap !important;
-  }
-  .toolbar-action .arrow {
-    margin-left: 0.3rem !important;
-  }
   .toolbar-meta {
-    font-size: 0.62rem !important;
+    font-size: 0.58rem !important;
     flex-shrink: 0 !important;
     white-space: nowrap !important;
     border-top: none !important;
     padding: 0 !important;
+    margin-left: auto !important;
   }
 
-  /* Toolbar sempre aberta no formato header (não tem mais collapse) */
-  .toolbar.open .toolbar-filters,
-  .toolbar.open .toolbar-actions,
-  .toolbar.open .toolbar-meta {
-    display: flex !important;
+  /* Separador entre summary e filtros */
+  .toolbar-summary::after {
+    content: "";
+    width: 1px;
+    height: 24px;
+    background: rgba(232, 221, 200, 0.12);
+    margin-left: 0.6rem;
   }
 
-  /* Como a toolbar agora é fixa no topo, empurra o conteúdo principal pra baixo */
+  /* Empurra o conteúdo principal pra baixo */
   body:not(.locked) main {
     padding-top: 80px !important;
   }
 
-  /* Mobile: header recolhe ou simplifica */
-  @media (max-width: 1000px) {
-    .toolbar {
-      left: var(--sidebar-margin) !important;
-    }
-  }
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     .toolbar {
       flex-wrap: wrap !important;
       height: auto !important;
@@ -2776,6 +2934,112 @@
     body:not(.locked) main {
       padding-top: 110px !important;
     }
+  }
+  @media (max-width: 1000px) {
+    .toolbar {
+      left: var(--sidebar-margin) !important;
+    }
+    body:not(.locked) main,
+    body:not(.locked) .toolbar {
+      margin-left: 0 !important;
+    }
+  }
+
+
+  /* Esconde botões de Exportar/Importar/Reset e meta de última atualização */
+  .toolbar-actions,
+  .toolbar-meta {
+    display: none !important;
+  }
+
+  /* ─────────────────────────────────────────
+     CORES PREENCHIDAS — assignee e prioridade
+     ───────────────────────────────────────── */
+
+  /* Chiara — preenchido em ouro */
+  .assignee-badge.chiara {
+    background: var(--gold) !important;
+    border-color: var(--gold-bright) !important;
+    color: var(--bg-deep) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 0 12px rgba(200, 151, 90, 0.4) !important;
+  }
+  /* Barigchun — preenchido em marfim/cream */
+  .assignee-badge.barigchun {
+    background: var(--cream) !important;
+    border-color: var(--cream-bright) !important;
+    color: var(--bg-deep) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 0 12px rgba(232, 221, 200, 0.3) !important;
+  }
+
+  /* Prioridade Alta — vermelho */
+  .priority-btn.alta {
+    background: #b85454 !important;
+    border-color: #d68a8a !important;
+    color: #fff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 0 12px rgba(184, 84, 84, 0.5) !important;
+  }
+  /* Prioridade Média — amarelo (tom dourado pra harmonizar com o resto) */
+  .priority-btn.media {
+    background: #d4a52a !important;
+    border-color: #e8c050 !important;
+    color: var(--bg-deep) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 0 12px rgba(212, 165, 42, 0.45) !important;
+  }
+  /* Prioridade Baixa — verde */
+  .priority-btn.baixa {
+    background: #6ba368 !important;
+    border-color: #8ec78a !important;
+    color: #fff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 0 12px rgba(107, 163, 104, 0.5) !important;
+  }
+
+  /* ─────────────────────────────────────────
+     LOGIN — background transparente + card glass intenso
+     A imagem do Tahoe e a animação de blobs aparecem atrás.
+     O card central tem glass igual ao sidebar/toolbar.
+     ───────────────────────────────────────── */
+  .login-gate {
+    background: transparent !important;
+  }
+  .login-gate::before {
+    /* Mantém apenas leve atmosfera dourada por cima da imagem */
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(200, 151, 90, 0.1), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(70, 98, 112, 0.15), transparent 60%) !important;
+  }
+  .login-card {
+    background: rgba(13, 21, 25, 0.55) !important;
+    backdrop-filter: blur(24px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.28) !important;
+    border-radius: 22px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 24px 80px rgba(0, 0, 0, 0.55),
+      0 8px 24px rgba(0, 0, 0, 0.35) !important;
+    overflow: hidden !important;
+  }
+  /* Reflexo de luz no topo (glass Apple) */
+  .login-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
+    pointer-events: none;
+    border-radius: 22px 22px 0 0;
   }
 
 </style>
@@ -2805,22 +3069,24 @@
 <!-- SIDEBAR DE NAVEGAÇÃO -->
 <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menu">☰</button>
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-brand">
-    <div class="sidebar-brand-eyebrow">La Vie en Rose</div>
-    <div class="sidebar-brand-title">Painel Operacional</div>
-    <div class="sidebar-brand-sub">Chiara &amp; Barigchun</div>
+  <div class="sidebar-inner">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-eyebrow">La Vie en Rose</div>
+      <div class="sidebar-brand-title">Painel Operacional</div>
+      <div class="sidebar-brand-sub">Chiara &amp; Barigchun</div>
+    </div>
+
+    <div class="sidebar-search">
+      <input type="text" id="searchInput" placeholder="Buscar tarefa..." />
+      <div class="sidebar-search-hint">/ pra focar · esc pra limpar</div>
+    </div>
+
+    <div class="sidebar-section-label">Visão geral</div>
+    <a class="sidebar-link" data-target="dashboard">Dashboard</a>
+
+    <div class="sidebar-section-label" style="margin-top: 0.5rem;">Fases</div>
+    <nav id="sidebarNav"></nav>
   </div>
-
-  <div class="sidebar-search">
-    <input type="text" id="searchInput" placeholder="Buscar tarefa..." />
-    <div class="sidebar-search-hint">/ pra focar · esc pra limpar</div>
-  </div>
-
-  <div class="sidebar-section-label">Visão geral</div>
-  <a class="sidebar-link" data-target="dashboard">Dashboard</a>
-
-  <div class="sidebar-section-label" style="margin-top: 0.5rem;">Fases</div>
-  <nav id="sidebarNav"></nav>
 </aside>
 
 <div class="keyboard-hint">/ buscar · 0 dashboard · 1-4 fases · esc limpar busca</div>
