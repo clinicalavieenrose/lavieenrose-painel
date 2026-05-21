@@ -154,10 +154,17 @@
     font-size: clamp(1.25rem, 2vw, 1.6rem);
     color: var(--text);
     font-weight: 400;
+    font-style: italic;
     max-width: 780px;
     line-height: 1.5;
     opacity: 0;
     animation: fadeUp 1s 0.7s forwards;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-sub {
+      font-size: 17.6px;
+    }
   }
   .hero-sub em {
     font-style: italic;
