@@ -1,0 +1,4440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<title>La Vie en Rose · Briefing — Operacional &amp; Acessos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #131e24;
+    --bg-deep: #0d1519;
+    --bg-card: #1f2f37;
+    --bg-card-hover: #2a3d47;
+    --gold: #c8975a;
+    --gold-bright: #d8a76a;
+    --gold-dim: rgba(200, 151, 90, 0.55);
+    --gold-line: rgba(200, 151, 90, 0.18);
+    --cream: #e8ddc8;
+    --cream-bright: #f0e6d2;
+    --text: #b8b5a8;
+    --text-soft: #8e8d80;
+    --text-muted: #5e6258;
+    --border: rgba(232, 221, 200, 0.08);
+    --border-soft: rgba(232, 221, 200, 0.04);
+
+    --font-display: "Lora", Georgia, serif;
+    --font-mono: "DM Mono", "SF Mono", Consolas, monospace;
+    --font-body: "Inter", -apple-system, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    overflow-x: hidden;
+    font-weight: 300;
+    letter-spacing: 0.005em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Background atmosphere - subtle texture + gradients */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(200, 151, 90, 0.06), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(200, 151, 90, 0.04), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.78 0 0 0 0 0.59 0 0 0 0 0.35 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+
+  main { position: relative; z-index: 2; }
+
+  /* ============ HERO ============ */
+  .hero {
+    min-height: 100vh;
+    padding: 3rem 5vw 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    color: var(--text-soft);
+    text-transform: uppercase;
+  }
+
+  .brand {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--cream);
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+
+  .brand-mono {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    margin-right: 0.6rem;
+    letter-spacing: 0.2em;
+  }
+
+  .hero-recipient { text-align: right; line-height: 1.7; }
+  .hero-recipient .label { color: var(--text-muted); font-size: 0.7rem; }
+  .hero-recipient .name { color: var(--cream); font-size: 0.78rem; }
+
+  .hero-content {
+    margin-top: auto;
+    max-width: 1100px;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 2.2rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.2s forwards;
+  }
+  .hero-eyebrow::before {
+    content: "•";
+    margin-right: 0.7rem;
+    color: var(--gold);
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(3rem, 7vw, 6.2rem);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 1.1s 0.45s forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .hero-sub {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    color: var(--text);
+    font-weight: 400;
+    max-width: 780px;
+    line-height: 1.5;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+  }
+  .hero-sub em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s 1s forwards;
+  }
+
+  .scroll-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .scroll-hint .line {
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: var(--gold);
+    transform-origin: left;
+    animation: scrollLine 2s infinite ease-in-out;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollLine {
+    0%, 100% { transform: scaleX(0.3); opacity: 0.4; }
+    50%      { transform: scaleX(1);   opacity: 1; }
+  }
+
+  /* ============ SECTION DIVIDERS ============ */
+  .section {
+    padding: 7rem 5vw;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1.5rem;
+  }
+  .section-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .section-lead {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: var(--text);
+    font-weight: 400;
+    max-width: 720px;
+    font-style: italic;
+    line-height: 1.55;
+    margin-bottom: 4rem;
+  }
+
+  /* ============ OVERVIEW (4 phases) ============ */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+  /* Em desktop, 2x2 */
+  @media (min-width: 820px) {
+    .overview-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .phase-card {
+    padding: 2rem 1.8rem;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(232, 221, 200, 0.025), transparent);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  .phase-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .phase-card:hover {
+    border-color: rgba(200, 151, 90, 0.35);
+    background: linear-gradient(180deg, rgba(200, 151, 90, 0.04), transparent);
+    transform: translateY(-2px);
+  }
+  .phase-card:hover::before { width: 100%; }
+
+  .phase-card .phase-num {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .phase-card .phase-days {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+  }
+  .phase-card .phase-name {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--cream);
+    font-size: 1.6rem;
+    line-height: 1.1;
+    margin-bottom: 0.8rem;
+  }
+  .phase-card .phase-desc {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    line-height: 1.55;
+  }
+
+  .overview-note {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--cream);
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 2rem 0 0;
+    border-top: 1px solid var(--gold-line);
+    margin-top: 2rem;
+  }
+  .overview-note em {
+    color: var(--gold);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  /* ============ PHASE BLOCK ============ */
+  .phase-block {
+    padding: 6rem 5vw 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  .phase-block:first-of-type { border-top: none; }
+
+  .phase-block.ongoing {
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(200, 151, 90, 0.025) 50%, transparent 100%);
+    margin-top: 2rem;
+    padding-top: 8rem;
+  }
+
+  .phase-block-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3rem;
+    align-items: end;
+    margin-bottom: 5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--gold-line);
+  }
+
+  .phase-number-display {
+    font-family: var(--font-display);
+    color: var(--gold);
+    font-size: clamp(5rem, 12vw, 10rem);
+    font-weight: 400;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+  }
+
+  .phase-info { padding-bottom: 1rem; }
+
+  .phase-info .label {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .phase-info .label .sep {
+    color: var(--text-muted);
+  }
+
+  .phase-info .name {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+  }
+  .phase-info .name em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .phase-info .summary {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--text);
+    font-size: 1.15rem;
+    line-height: 1.5;
+    max-width: 600px;
+  }
+
+  /* ============ STEPS ============ */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 3rem;
+    padding: 3.5rem 0;
+    border-top: 1px solid var(--border-soft);
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .step.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .step:first-child { border-top: none; padding-top: 0; }
+
+  .step-marker {
+    position: relative;
+  }
+  .step-marker .num {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    font-weight: 400;
+  }
+
+  .step-marker .duration {
+    display: block;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    margin-top: 0.6rem;
+    text-transform: uppercase;
+  }
+
+  .step-body { display: flex; flex-direction: column; gap: 1.6rem; }
+
+  .step-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(1.55rem, 2.4vw, 2.1rem);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .step-title em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .step-intro {
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.7;
+    max-width: 760px;
+  }
+  .step-intro em {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--cream);
+    font-size: 1.08em;
+  }
+
+  .step-section {
+    margin-top: 0.5rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .step-section-label {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .step-section-label::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .checklist li {
+    position: relative;
+    padding-left: 1.6rem;
+    font-size: 0.94rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .checklist li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--gold-dim);
+    font-size: 0.85rem;
+    font-family: var(--font-mono);
+  }
+
+  .checklist li strong {
+    color: var(--cream);
+    font-weight: 500;
+  }
+
+  .checklist li em {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1.02em;
+  }
+
+  /* Tools row */
+  .tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+  }
+
+  .tool-chip {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--gold-line);
+    background: rgba(200, 151, 90, 0.04);
+    text-transform: uppercase;
+  }
+
+  /* Deliverable */
+  .deliverable {
+    margin-top: 1rem;
+    padding: 1.4rem 1.6rem;
+    background: linear-gradient(90deg, rgba(200, 151, 90, 0.07), transparent 70%);
+    border-left: 2px solid var(--gold);
+  }
+
+  .deliverable-label {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .deliverable-text {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: 1.15rem;
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  /* ============ MID DIVIDER ============ */
+  .mid-divider {
+    padding: 8rem 5vw 6rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    border-top: 1px solid var(--gold-line);
+    border-bottom: 1px solid var(--gold-line);
+  }
+
+  .mid-divider .eyebrow {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+  .mid-divider .title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+  .mid-divider .title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .mid-divider .sub {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--text);
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+  }
+
+  /* ============ ONGOING TRACKS ============ */
+  .tracks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .track {
+    border: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+    background: linear-gradient(180deg, rgba(232, 221, 200, 0.02), transparent);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .track::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 100% 0%, rgba(200, 151, 90, 0.1), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+  .track:hover {
+    border-color: rgba(200, 151, 90, 0.35);
+    transform: translateY(-3px);
+  }
+  .track:hover::after { opacity: 1; }
+
+  .track-num {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .track-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: 1.65rem;
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+  }
+  .track-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .track-rhythm {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 1.6rem;
+    text-transform: uppercase;
+  }
+  .track-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    font-size: 0.92rem;
+    color: var(--text);
+  }
+  /* track-list agora herda comportamento de checklist (ver .checklist) */
+
+  /* ============ KPI BLOCK ============ */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .kpi {
+    background: var(--bg);
+    padding: 2rem 1.8rem;
+    transition: background 0.4s;
+  }
+  .kpi:hover { background: var(--bg-card); }
+
+  .kpi-label {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .kpi-list {
+    list-style: none;
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  /* ============ CLOSING ============ */
+  .closing {
+    min-height: 80vh;
+    padding: 8rem 5vw 6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .closing-eyebrow {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+  }
+  .closing-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(3rem, 6.5vw, 5.5rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+  }
+  .closing-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .closing-sub {
+    font-family: var(--font-display);
+    color: var(--text);
+    font-size: 1.4rem;
+    font-style: italic;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    line-height: 1.5;
+  }
+
+  .closing-meta {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--gold-line);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 800px) {
+    .hero { padding: 2rem 6vw 3rem; }
+    .hero-top { flex-direction: column; gap: 1rem; }
+    .hero-recipient { text-align: left; }
+    .hero-bottom { flex-direction: column; gap: 1.5rem; align-items: flex-start; }
+    .section { padding: 5rem 6vw; }
+    .phase-block { padding: 4rem 6vw 3rem; }
+    .phase-block-header {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .step { grid-template-columns: 1fr; gap: 1.2rem; padding: 2.8rem 0; }
+    .step-marker { display: flex; gap: 1.5rem; align-items: baseline; }
+    .step-marker .duration { margin-top: 0; }
+    .closing-meta { flex-direction: column; gap: 1rem; }
+  }
+
+  /* Subtle parallax-ish effect on long page */
+  @media (prefers-reduced-motion: no-preference) {
+    .step, .track, .phase-card, .kpi {
+      will-change: transform, opacity;
+    }
+  }
+
+  /* ============ INTERACTIVE CHECKLIST ============ */
+  .checklist li {
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.3s ease, color 0.3s ease;
+  }
+
+  .checklist li:hover::before {
+    color: var(--gold);
+    transform: scale(1.1);
+  }
+
+  .checklist li::before {
+    transition: color 0.3s ease, transform 0.3s ease, content 0s;
+  }
+
+  .checklist li.done {
+    opacity: 0.42;
+  }
+
+  .checklist li.done::before {
+    content: "■";
+    color: var(--gold);
+  }
+
+  .checklist li.done strong,
+  .checklist li.done em {
+    text-decoration: line-through;
+    text-decoration-color: var(--gold-dim);
+    text-decoration-thickness: 1px;
+  }
+
+  .checklist li .task-meta {
+    display: block;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    margin-top: 0.35rem;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .checklist li.done .task-meta {
+    opacity: 0.7;
+  }
+
+  /* Step counter */
+  .step-counter {
+    display: block;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    margin-top: 0.45rem;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .step-counter.complete {
+    color: var(--gold);
+  }
+
+  .step-counter.complete::after {
+    content: " ✓";
+    color: var(--gold);
+  }
+
+  /* Phase progress bar */
+  .phase-progress {
+    margin-top: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 460px;
+  }
+
+  .phase-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .phase-progress-label .pct {
+    color: var(--gold);
+  }
+
+  .phase-progress-bar {
+    height: 2px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .phase-progress-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ============ TOOLBAR (fixed top right) ============ */
+  .toolbar {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: rgba(13, 21, 25, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--gold-line);
+    min-width: 280px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .toolbar-summary {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .toolbar-label {
+    font-family: var(--font-mono);
+    color: var(--text-soft);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .toolbar-counter {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: 1rem;
+  }
+  .toolbar-counter .total {
+    color: var(--text-muted);
+    margin-left: 0.3rem;
+  }
+
+  .toolbar-progress {
+    height: 2px;
+    background: rgba(232, 221, 200, 0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .toolbar-progress-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright));
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .toolbar-actions {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 1px solid transparent;
+  }
+
+  .toolbar.open .toolbar-actions {
+    max-height: 400px;
+    border-top-color: var(--gold-line);
+  }
+
+  .toolbar-action {
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border-soft);
+    padding: 0.85rem 1.25rem;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+  }
+  .toolbar-action:last-child { border-bottom: none; }
+  .toolbar-action:hover {
+    background: rgba(200, 151, 90, 0.06);
+    color: var(--cream-bright);
+    padding-left: 1.5rem;
+  }
+  .toolbar-action .arrow {
+    color: var(--gold);
+    opacity: 0.6;
+  }
+  .toolbar-action.danger:hover {
+    color: #d4856a;
+  }
+
+  .toolbar-meta {
+    padding: 0.7rem 1.25rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    border-top: 1px solid var(--border-soft);
+    text-transform: uppercase;
+  }
+
+  .toolbar-toggle {
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    transition: transform 0.4s;
+  }
+  .toolbar.open .toolbar-toggle {
+    transform: rotate(180deg);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    z-index: 200;
+    background: rgba(13, 21, 25, 0.96);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--gold);
+    padding: 1rem 1.5rem;
+    font-family: var(--font-mono);
+    color: var(--cream-bright);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Hidden file input */
+  #importInput { display: none; }
+
+  @media (max-width: 800px) {
+    .toolbar {
+      top: auto;
+      bottom: 1rem;
+      right: 1rem;
+      left: 1rem;
+      min-width: auto;
+    }
+    .toolbar-summary { padding: 0.85rem 1rem; }
+  }
+
+  /* ============ TASK ACTIONS (assignee + comment) ============ */
+  .checklist li {
+    padding-right: 5.5rem;
+  }
+
+  .task-actions {
+    position: absolute;
+    right: 0;
+    top: -2px;
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .checklist li:hover .task-actions,
+  .checklist li.has-assignee .task-actions,
+  .checklist li.has-comment .task-actions {
+    opacity: 1;
+  }
+
+  .assignee-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border-radius: 50%;
+    padding: 0;
+    user-select: none;
+  }
+  .assignee-badge:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .assignee-badge.chiara {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+    background: rgba(200, 151, 90, 0.1);
+  }
+  .assignee-badge.barigchun {
+    color: var(--cream-bright);
+    border-color: var(--cream);
+    background: rgba(232, 221, 200, 0.08);
+  }
+
+  .comment-btn {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.25s ease;
+    border-radius: 50%;
+    padding: 0;
+  }
+  .comment-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .comment-btn.active {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: rgba(200, 151, 90, 0.08);
+  }
+
+  .task-comment {
+    max-height: 0;
+    overflow: hidden;
+    margin-top: 0;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), margin-top 0.4s;
+  }
+  .task-comment.open {
+    max-height: 240px;
+    margin-top: 0.7rem;
+  }
+
+  .task-comment-inner {
+    padding: 0.85rem 1rem;
+    background: rgba(0, 0, 0, 0.18);
+    border-left: 2px solid var(--gold-line);
+  }
+
+  .task-comment textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    resize: vertical;
+    min-height: 50px;
+    outline: none;
+    padding: 0;
+  }
+  .task-comment textarea::placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .task-comment-meta {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* ============ FILTERS (in toolbar) ============ */
+  .filter-row {
+    display: flex;
+    border-top: 1px solid var(--border-soft);
+  }
+  .filter-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    border-right: 1px solid var(--border-soft);
+    padding: 0.7rem 0.5rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .filter-btn:last-child { border-right: none; }
+  .filter-btn:hover { color: var(--cream); }
+  .filter-btn.active {
+    color: var(--gold);
+    background: rgba(200, 151, 90, 0.06);
+  }
+
+  /* Hide tasks based on body filter class */
+  body.filter-pending .checklist li.done {
+    display: none;
+  }
+  body.filter-done .checklist li:not(.done) {
+    display: none;
+  }
+  body.filter-chiara .checklist li:not(.assignee-chiara) {
+    display: none;
+  }
+  body.filter-barigchun .checklist li:not(.assignee-barigchun) {
+    display: none;
+  }
+
+  /* Empty state per step quando filtro esconde tudo */
+  .step-empty {
+    display: none;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    padding: 1rem 0;
+  }
+  body[class*="filter-"] .step:has(.checklist:not(:has(li:not([style*='display: none'])))) .step-empty {
+    display: block;
+  }
+
+  @media (max-width: 800px) {
+    .checklist li { padding-right: 0; }
+    .task-actions {
+      position: relative;
+      top: auto;
+      right: auto;
+      opacity: 1;
+      margin-top: 0.6rem;
+      margin-left: 1.6rem;
+    }
+  }
+
+  /* ============ LOGIN GATE ============ */
+  .login-gate {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-deep);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  .login-gate.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .login-gate::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(200, 151, 90, 0.08), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(200, 151, 90, 0.05), transparent 60%);
+    pointer-events: none;
+  }
+  .login-card {
+    position: relative;
+    max-width: 440px;
+    width: 100%;
+    padding: 3rem 2.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .login-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .login-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--cream-bright);
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+  .login-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    margin-bottom: 2rem;
+  }
+  .login-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--cream-bright);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .login-input:focus {
+    border-color: var(--gold-dim);
+  }
+  .login-btn {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: var(--gold);
+    border: none;
+    border-radius: 3px;
+    color: var(--bg-deep);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .login-btn:hover { background: var(--gold-bright); }
+  .login-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .login-error {
+    color: #d68a8a;
+    font-size: 0.82rem;
+    margin-top: 0.8rem;
+    min-height: 1.2em;
+  }
+  .login-hint {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* ============ SYNC INDICATOR ============ */
+  .sync-indicator {
+    position: fixed;
+    bottom: 1.2rem;
+    right: 1.2rem;
+    z-index: 100;
+    padding: 0.4rem 0.8rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+  .sync-indicator.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .sync-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .sync-indicator.saving .sync-dot {
+    background: var(--gold);
+    animation: sync-pulse 1s ease-in-out infinite;
+  }
+  .sync-indicator.saved .sync-dot {
+    background: #7fb87f;
+  }
+  .sync-indicator.error .sync-dot {
+    background: #d68a8a;
+  }
+  @keyframes sync-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* Esconde corpo até autenticar */
+  body.locked main,
+  body.locked .toolbar,
+  body.locked .sidebar,
+  body.locked .toast {
+    visibility: hidden;
+  }
+
+
+  /* ============================================================
+     SIDEBAR DE NAVEGAÇÃO
+     ============================================================ */
+  :root {
+    --sidebar-width: 280px;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--bg-deep);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 50;
+    padding: 1.4rem 0 6rem;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+    /* Move a scrollbar para o lado esquerdo do sidebar.
+       direction: rtl no container vira a barra de rolagem;
+       direction: ltr no inner restaura a leitura normal do conteúdo. */
+    direction: rtl;
+  }
+  .sidebar > * { direction: ltr; }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+
+  .sidebar-brand {
+    padding: 0 1.4rem 1.4rem;
+    border-bottom: 1px solid var(--border-soft);
+    margin-bottom: 1rem;
+  }
+  .sidebar-brand-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+  }
+  .sidebar-brand-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--cream-bright);
+    line-height: 1.2;
+    font-weight: 500;
+  }
+  .sidebar-brand-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  .sidebar-search {
+    padding: 0 1.4rem 1rem;
+  }
+  .sidebar-search input {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--cream-bright);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .sidebar-search input::placeholder { color: var(--text-muted); }
+  .sidebar-search input:focus { border-color: var(--gold-dim); }
+  .sidebar-search-hint {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    margin-top: 0.4rem;
+    letter-spacing: 0.05em;
+  }
+
+  .sidebar-section-label {
+    padding: 0.6rem 1.4rem 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .sidebar-link {
+    display: block;
+    padding: 0.55rem 1.4rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.82rem;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .sidebar-link:hover {
+    background: var(--bg-card);
+    color: var(--cream-bright);
+  }
+  .sidebar-link.active {
+    border-left-color: var(--gold);
+    background: var(--bg-card);
+    color: var(--cream-bright);
+  }
+
+  .sidebar-phase {
+    margin-top: 0.4rem;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 0.4rem;
+  }
+  .sidebar-phase:first-of-type { border-top: none; }
+
+  .sidebar-phase-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.4rem 0.4rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .sidebar-phase-header:hover { background: var(--bg-card); }
+  .sidebar-phase-header.active .sidebar-phase-num,
+  .sidebar-phase-header.active .sidebar-phase-name { color: var(--gold-bright); }
+
+  .sidebar-phase-num {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .sidebar-phase-name {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    color: var(--cream);
+    margin-top: 0.15rem;
+    font-weight: 500;
+  }
+  .sidebar-phase-pct {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--gold);
+  }
+
+  .sidebar-phase-bar {
+    height: 2px;
+    margin: 0 1.4rem;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .sidebar-phase-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .sidebar-step-list {
+    padding: 0.4rem 0 0.6rem;
+  }
+
+  .sidebar-step {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 1.4rem 0.4rem 1.8rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.78rem;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+    line-height: 1.3;
+  }
+  .sidebar-step:hover {
+    background: var(--bg-card);
+    color: var(--cream-bright);
+  }
+  .sidebar-step.active {
+    border-left-color: var(--gold);
+    background: var(--bg-card);
+    color: var(--cream-bright);
+  }
+  .sidebar-step-status {
+    flex-shrink: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1.5px solid var(--text-muted);
+    background: transparent;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .sidebar-step-status.partial {
+    border-color: var(--gold);
+    background:
+      conic-gradient(var(--gold) calc(var(--pct, 0) * 1%), transparent 0);
+  }
+  .sidebar-step-status.complete {
+    border-color: var(--gold);
+    background: var(--gold);
+  }
+  .sidebar-step-status.complete::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background-image: linear-gradient(45deg, transparent 45%, var(--bg-deep) 45%, var(--bg-deep) 55%, transparent 55%),
+                      linear-gradient(-45deg, transparent 45%, var(--bg-deep) 45%, var(--bg-deep) 55%, transparent 55%);
+    background-size: 60% 2px, 60% 2px;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+  }
+  .sidebar-step-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sidebar-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 60;
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--cream-bright);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+  }
+
+  body.sidebar-open .sidebar { transform: translateX(0); }
+
+  /* Empurra o conteúdo principal pra direita pra dar espaço pro sidebar */
+  body:not(.locked) main,
+  body:not(.locked) .toolbar { margin-left: var(--sidebar-width); }
+
+  @media (max-width: 1000px) {
+    .sidebar {
+      transform: translateX(-100%);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+    }
+    body.sidebar-open .sidebar { transform: translateX(0); }
+    .sidebar-toggle { display: flex; }
+    body:not(.locked) main,
+    body:not(.locked) .toolbar { margin-left: 0; }
+  }
+
+  /* ============================================================
+     DASHBOARD COMPACTO (substitui hero gigante)
+     ============================================================ */
+  .dashboard {
+    padding: 3rem 4vw 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .dashboard-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+  .dashboard-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    color: var(--cream-bright);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+  }
+  .dashboard-title em { color: var(--gold-bright); font-style: italic; }
+  .dashboard-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    max-width: 60ch;
+    margin-bottom: 2rem;
+  }
+
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat {
+    padding: 1rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--cream-bright);
+    line-height: 1;
+    font-weight: 500;
+  }
+  .stat-value .denom {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+  }
+  .stat-sub {
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    margin-top: 0.3rem;
+  }
+
+  .dashboard-phases {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 2.5rem;
+  }
+  /* Em desktop, 2x2 */
+  @media (min-width: 760px) {
+    .dashboard-phases {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .dash-phase {
+    padding: 1rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .dash-phase:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--gold-dim);
+    transform: translateY(-2px);
+  }
+  .dash-phase-num {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .dash-phase-name {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--cream-bright);
+    margin: 0.3rem 0 0.6rem;
+    font-weight: 500;
+  }
+  .dash-phase-progress {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.4rem;
+  }
+  .dash-phase-progress-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  .dash-phase-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-soft);
+  }
+
+  .dashboard-section-title {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .upcoming-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .upcoming-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .upcoming-item:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--gold-dim);
+  }
+  .upcoming-where {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+  .upcoming-text {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .upcoming-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .upcoming-empty {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    background: var(--bg-card);
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+  }
+
+  /* ============================================================
+     PRIORIDADE (badge nas tarefas)
+     ============================================================ */
+  .priority-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    padding: 0;
+  }
+  .priority-btn:hover { border-color: var(--gold-dim); color: var(--cream); }
+  .priority-btn.alta {
+    background: rgba(214, 138, 138, 0.18);
+    border-color: rgba(214, 138, 138, 0.5);
+    color: #d68a8a;
+  }
+  .priority-btn.media {
+    background: rgba(200, 151, 90, 0.18);
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  .priority-btn.baixa {
+    background: rgba(127, 184, 127, 0.15);
+    border-color: rgba(127, 184, 127, 0.4);
+    color: #7fb87f;
+  }
+
+  /* ============================================================
+     PRAZO (data limite)
+     ============================================================ */
+  .deadline-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.18rem 0.5rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .deadline-btn:hover { border-color: var(--gold-dim); color: var(--cream); }
+  .deadline-btn.set {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .deadline-btn.overdue {
+    color: #d68a8a;
+    border-color: rgba(214, 138, 138, 0.4);
+    background: rgba(214, 138, 138, 0.08);
+  }
+  .deadline-btn.due-soon {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+    background: rgba(200, 151, 90, 0.1);
+  }
+
+  /* Linha de meta nas tasks fica mais densa */
+  .task-actions {
+    align-items: center;
+  }
+
+  /* Highlight de busca */
+  .checklist li.search-hidden { display: none; }
+  .checklist li.search-match {
+    background: rgba(200, 151, 90, 0.06);
+    border-left: 2px solid var(--gold);
+  }
+
+  /* ============================================================
+     COMPRESSÃO VISUAL (mais denso, mas mantendo elegância)
+     ============================================================ */
+  .phase-block { padding: 2.5rem 4vw 2rem; }
+  .step { padding: 1.2rem 0; }
+  .step-intro { font-size: 0.92rem; line-height: 1.55; margin-bottom: 1rem; }
+  .step-title { font-size: 1.15rem; margin-bottom: 0.4rem; }
+  .checklist li { padding: 0.55rem 0 0.55rem 1.6rem; line-height: 1.45; }
+
+  /* Hide hero gigante quando tem dashboard */
+  body.has-dashboard .hero { display: none; }
+  body.has-dashboard .intro-section { display: none; }
+
+  /* Atalho indicador no canto inferior */
+  .keyboard-hint {
+    position: fixed;
+    bottom: 1rem;
+    left: calc(var(--sidebar-width) + 1rem);
+    z-index: 40;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  @media (max-width: 1000px) {
+    .keyboard-hint { display: none; }
+  }
+
+
+  /* ============================================================
+     LIQUID GLASS UI — efeito vidro em todos os elementos
+     ============================================================ */
+
+  /* Tokens auxiliares de vidro */
+  :root {
+    --glass-bg: rgba(31, 47, 55, 0.45);
+    --glass-bg-strong: rgba(31, 47, 55, 0.62);
+    --glass-bg-soft: rgba(31, 47, 55, 0.28);
+    --glass-border: rgba(232, 221, 200, 0.12);
+    --glass-border-bright: rgba(232, 221, 200, 0.22);
+    --glass-highlight: rgba(255, 255, 255, 0.06);
+    --glass-blur: 18px;
+    --glass-blur-strong: 24px;
+  }
+
+  /* ============================================================
+     BACKGROUND: imagem Tahoe Dusk + blobs orgânicos como névoa
+     ============================================================ */
+
+  /* Imagem de fundo no body */
+  body {
+    background:
+      url("./tahoe-dusk.webp") center / cover no-repeat fixed,
+      var(--bg) !important;
+  }
+
+  /* Camada 1 (body::before): blobs orgânicos #19262D animados como névoa.
+     Usa múltiplos radial-gradients posicionados via custom properties
+     que mudam com keyframes — efeito de névoa flutuando.
+     IMPORTANTE: position/inset/content são re-declarados aqui pra garantir
+     que os blobs fiquem fixed acima da imagem de fundo do body. */
+  body::before {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+    background:
+      radial-gradient(ellipse 55% 40% at var(--blob1-x, 18%) var(--blob1-y, 28%), rgba(25, 38, 45, 0.55), rgba(25, 38, 45, 0.25) 45%, transparent 75%),
+      radial-gradient(ellipse 50% 50% at var(--blob2-x, 78%) var(--blob2-y, 62%), rgba(25, 38, 45, 0.5), rgba(25, 38, 45, 0.22) 45%, transparent 75%),
+      radial-gradient(ellipse 65% 35% at var(--blob3-x, 48%) var(--blob3-y, 88%), rgba(25, 38, 45, 0.45), rgba(25, 38, 45, 0.18) 50%, transparent 78%),
+      radial-gradient(ellipse 45% 55% at var(--blob4-x, 92%) var(--blob4-y, 12%), rgba(25, 38, 45, 0.42), rgba(25, 38, 45, 0.16) 50%, transparent 78%),
+      linear-gradient(180deg, rgba(25, 38, 45, 0.25), rgba(25, 38, 45, 0.4)) !important;
+    animation: fog-drift 45s ease-in-out infinite alternate !important;
+    z-index: 1 !important;
+  }
+
+  /* Camada 2 (body::after): toques residuais de luz dourada/azul */
+  body::after {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+    background:
+      radial-gradient(ellipse 600px 400px at 80% 20%, rgba(200, 151, 90, 0.05), transparent 60%),
+      radial-gradient(ellipse 500px 300px at 15% 80%, rgba(70, 98, 112, 0.08), transparent 60%) !important;
+    opacity: 1 !important;
+    mix-blend-mode: normal !important;
+    z-index: 2 !important;
+  }
+
+  /* Animação dos blobs: cada um se desloca por trajetórias diferentes */
+  @keyframes fog-drift {
+    0% {
+      --blob1-x: 18%; --blob1-y: 28%;
+      --blob2-x: 78%; --blob2-y: 62%;
+      --blob3-x: 48%; --blob3-y: 88%;
+      --blob4-x: 92%; --blob4-y: 12%;
+    }
+    25% {
+      --blob1-x: 32%; --blob1-y: 42%;
+      --blob2-x: 62%; --blob2-y: 52%;
+      --blob3-x: 62%; --blob3-y: 78%;
+      --blob4-x: 82%; --blob4-y: 22%;
+    }
+    50% {
+      --blob1-x: 28%; --blob1-y: 58%;
+      --blob2-x: 82%; --blob2-y: 38%;
+      --blob3-x: 38%; --blob3-y: 82%;
+      --blob4-x: 72%; --blob4-y: 28%;
+    }
+    75% {
+      --blob1-x: 12%; --blob1-y: 48%;
+      --blob2-x: 72%; --blob2-y: 72%;
+      --blob3-x: 55%; --blob3-y: 92%;
+      --blob4-x: 88%; --blob4-y: 18%;
+    }
+    100% {
+      --blob1-x: 24%; --blob1-y: 32%;
+      --blob2-x: 76%; --blob2-y: 56%;
+      --blob3-x: 50%; --blob3-y: 86%;
+      --blob4-x: 94%; --blob4-y: 16%;
+    }
+  }
+
+  /* Custom properties precisam ser registradas pra animar smoothly.
+     Sem isso, navegadores modernos pulam de keyframe a keyframe. */
+  @property --blob1-x { syntax: "<percentage>"; inherits: false; initial-value: 18%; }
+  @property --blob1-y { syntax: "<percentage>"; inherits: false; initial-value: 28%; }
+  @property --blob2-x { syntax: "<percentage>"; inherits: false; initial-value: 78%; }
+  @property --blob2-y { syntax: "<percentage>"; inherits: false; initial-value: 62%; }
+  @property --blob3-x { syntax: "<percentage>"; inherits: false; initial-value: 48%; }
+  @property --blob3-y { syntax: "<percentage>"; inherits: false; initial-value: 88%; }
+  @property --blob4-x { syntax: "<percentage>"; inherits: false; initial-value: 92%; }
+  @property --blob4-y { syntax: "<percentage>"; inherits: false; initial-value: 12%; }
+
+  /* Garante z-index correto: imagem do body (0) → blobs (1) → luz (2) → main (3) → sidebar (50) → toolbar (100) */
+  main { z-index: 3 !important; position: relative !important; }
+
+  /* Mobile: anima mais devagar (economia de bateria) */
+  @media (max-width: 768px) {
+    body::before { animation-duration: 80s; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body::before { animation: none; }
+  }
+
+  /* Mixin base de glass para reutilizar como conceito visual.
+     Aplicado em cada componente individualmente. */
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    background: rgba(13, 21, 25, 0.55) !important;
+    backdrop-filter: blur(var(--glass-blur-strong)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(140%);
+    border-right: 1px solid var(--glass-border);
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.04);
+  }
+
+  /* ===== DASHBOARD STAT CARDS ===== */
+  .stat {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      0 4px 20px rgba(0, 0, 0, 0.18);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+    pointer-events: none;
+  }
+
+  /* ===== DASHBOARD PHASE CARDS ===== */
+  .dash-phase {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      0 4px 20px rgba(0, 0, 0, 0.18);
+    position: relative;
+    overflow: hidden;
+  }
+  .dash-phase::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+    pointer-events: none;
+  }
+  .dash-phase:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 8px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  /* ===== UPCOMING ITEMS ===== */
+  .upcoming-item {
+    background: var(--glass-bg-soft) !important;
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: inset 0 1px 0 var(--glass-highlight);
+  }
+  .upcoming-item:hover {
+    background: var(--glass-bg) !important;
+    border-color: var(--glass-border-bright) !important;
+  }
+  .upcoming-empty {
+    background: var(--glass-bg-soft) !important;
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  }
+
+  /* ===== OVERVIEW PHASE CARDS ===== */
+  .phase-card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      0 4px 20px rgba(0, 0, 0, 0.18);
+    position: relative;
+    overflow: hidden;
+  }
+  .phase-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+    pointer-events: none;
+  }
+  .phase-card:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 8px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  /* ===== PHASE BLOCKS (cada fase grande) ===== */
+  .phase-block {
+    position: relative;
+  }
+  .phase-block::before {
+    content: "";
+    position: absolute;
+    inset: 1.5rem 2rem;
+    background: var(--glass-bg-soft);
+    backdrop-filter: blur(var(--glass-blur)) saturate(130%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(130%);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      0 4px 24px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* ===== STEP / TRACK ===== */
+  .step, .track {
+    position: relative;
+    padding: 1.5rem 1.4rem !important;
+    margin-bottom: 0.8rem;
+    background: var(--glass-bg-soft);
+    backdrop-filter: blur(14px) saturate(135%);
+    -webkit-backdrop-filter: blur(14px) saturate(135%);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      0 2px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ===== MICROTAREFAS (cada li individual) ===== */
+  .checklist li {
+    background: rgba(31, 47, 55, 0.32);
+    backdrop-filter: blur(10px) saturate(130%);
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem 0.7rem 2rem !important;
+    margin-bottom: 0.4rem;
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      0 1px 6px rgba(0, 0, 0, 0.08);
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .checklist li:hover {
+    background: rgba(31, 47, 55, 0.5);
+    border-color: var(--glass-border-bright);
+  }
+  .checklist li::before {
+    /* Reposiciona o checkmark dentro do novo padding */
+    left: 0.75rem !important;
+    top: 0.7rem !important;
+  }
+  .checklist li.done {
+    background: rgba(200, 151, 90, 0.08);
+    border-color: rgba(200, 151, 90, 0.28);
+  }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar {
+    background: rgba(13, 21, 25, 0.55) !important;
+    backdrop-filter: blur(var(--glass-blur-strong)) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(160%) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 8px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ===== LOGIN GATE ===== */
+  .login-card {
+    background: var(--glass-bg-strong) !important;
+    backdrop-filter: blur(var(--glass-blur-strong)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(160%);
+    border: 1px solid var(--glass-border-bright) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 16px 64px rgba(0, 0, 0, 0.45);
+    position: relative;
+    overflow: hidden;
+  }
+  .login-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
+    pointer-events: none;
+  }
+  .login-input {
+    background: rgba(13, 21, 25, 0.5) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border) !important;
+  }
+
+  /* ===== SYNC INDICATOR ===== */
+  .sync-indicator {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border) !important;
+  }
+
+  /* ===== KPI ===== */
+  .kpi {
+    background: var(--glass-bg-soft) !important;
+    backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+  }
+  .kpi:hover {
+    background: var(--glass-bg) !important;
+  }
+
+  /* ===== COMMENT AREA ===== */
+  .task-comment-inner textarea {
+    background: rgba(13, 21, 25, 0.5) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* ===== SEARCH INPUT (sidebar) ===== */
+  .sidebar-search input {
+    background: rgba(13, 21, 25, 0.5) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Performance hint pro navegador: reduz repaints durante scroll */
+  .checklist li, .step, .track, .phase-card, .dash-phase, .stat, .upcoming-item {
+    will-change: auto;
+    transform: translateZ(0);
+  }
+
+  /* Quando uma tarefa está sendo arrastada/animada, força aceleração de hardware */
+  .checklist li.in-view {
+    contain: layout style paint;
+  }
+
+  /* Em mobile, reduz blur pra melhorar performance */
+  @media (max-width: 768px) {
+    :root {
+      --glass-blur: 10px;
+      --glass-blur-strong: 14px;
+    }
+    .checklist li {
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+  }
+
+  /* Fallback: se backdrop-filter não for suportado, fundos ficam mais opacos */
+  @supports not (backdrop-filter: blur(1px)) {
+    .sidebar, .toolbar, .login-card {
+      background: rgba(13, 21, 25, 0.92) !important;
+    }
+    .stat, .dash-phase, .phase-card, .upcoming-item, .step, .track {
+      background: rgba(31, 47, 55, 0.85) !important;
+    }
+    .checklist li {
+      background: rgba(31, 47, 55, 0.7) !important;
+    }
+  }
+
+
+  /* ============================================================
+     BORDER-RADIUS MAIOR — estilo liquid glass arredondado
+     ============================================================ */
+  .stat,
+  .dash-phase,
+  .upcoming-item,
+  .upcoming-empty,
+  .phase-card,
+  .login-card,
+  .sync-indicator,
+  .toolbar,
+  .step,
+  .track {
+    border-radius: 18px !important;
+  }
+
+  /* Cards menores (ex: microtarefas) com radius proporcional */
+  .checklist li {
+    border-radius: 12px !important;
+  }
+
+  .login-input,
+  .login-btn,
+  .sidebar-search input {
+    border-radius: 10px !important;
+  }
+
+  .priority-btn,
+  .assignee-badge {
+    border-radius: 50% !important;
+  }
+
+  .deadline-btn {
+    border-radius: 8px !important;
+  }
+
+  /* O ::before do phase-block (camada glass dele) também ganha radius maior */
+  .phase-block::before {
+    border-radius: 20px !important;
+  }
+
+  /* ============================================================
+     HOVER OURO #C98A42 NAS TAREFAS CONCLUÍDAS
+     ============================================================ */
+  .checklist li.done {
+    background: rgba(201, 138, 66, 0.1) !important;
+    border-color: rgba(201, 138, 66, 0.28) !important;
+  }
+  .checklist li.done:hover {
+    background: rgba(201, 138, 66, 0.22) !important;
+    border-color: rgba(201, 138, 66, 0.55) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 4px 18px rgba(201, 138, 66, 0.18) !important;
+    transform: translateY(-1px);
+  }
+  /* Texto e marcador também ganham mais brilho dourado no hover */
+  .checklist li.done:hover::before {
+    color: #C98A42 !important;
+  }
+
+  /* ============================================================
+     TAREFAS CONCLUÍDAS — base mais visível + hover dramático
+     (sobrescreve as regras acima com mais intensidade)
+     ============================================================ */
+
+  /* Base: tarefa concluída já fica claramente identificável (sem hover) */
+  .checklist li.done {
+    background: rgba(201, 138, 66, 0.18) !important;
+    border-color: rgba(201, 138, 66, 0.45) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 2px 8px rgba(201, 138, 66, 0.08) !important;
+  }
+
+  /* Hover: dramaticamente dourado, brilhante */
+  .checklist li.done:hover {
+    background: rgba(201, 138, 66, 0.45) !important;
+    border-color: #C98A42 !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 0 0 1px rgba(201, 138, 66, 0.4),
+      0 8px 32px rgba(201, 138, 66, 0.35) !important;
+    transform: translateY(-2px);
+  }
+
+  /* Texto e marcadores também ganham brilho dourado no hover */
+  .checklist li.done .task-meta {
+    color: #d4a05a !important;
+  }
+  .checklist li.done:hover::before {
+    color: #f0c87a !important;
+    text-shadow: 0 0 8px rgba(201, 138, 66, 0.6);
+  }
+  .checklist li.done:hover strong {
+    color: #f5e2c4 !important;
+  }
+  .checklist li.done:hover .task-meta {
+    color: #f0c87a !important;
+  }
+
+  /* ============================================================
+     SIDEBAR — ILHA FLUTUANTE (descolada das bordas)
+     ============================================================ */
+  :root {
+    --sidebar-margin: 14px;
+  }
+
+  .sidebar {
+    top: var(--sidebar-margin) !important;
+    left: var(--sidebar-margin) !important;
+    bottom: var(--sidebar-margin) !important;
+    width: calc(var(--sidebar-width) - var(--sidebar-margin)) !important;
+    border-radius: 20px !important;
+    border: 1px solid var(--glass-border-bright) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 12px 48px rgba(0, 0, 0, 0.4),
+      0 4px 16px rgba(0, 0, 0, 0.2) !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Reflexo de luz no topo do sidebar (efeito glass) */
+  .sidebar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+    pointer-events: none;
+    border-radius: 20px 20px 0 0;
+  }
+
+  /* Margem do conteúdo principal precisa acompanhar a nova largura efetiva */
+  body:not(.locked) main,
+  body:not(.locked) .toolbar {
+    margin-left: calc(var(--sidebar-width) + var(--sidebar-margin)) !important;
+  }
+
+  /* Mobile: sidebar continua deslizando da esquerda, com bordas arredondadas */
+  @media (max-width: 1000px) {
+    body:not(.locked) main,
+    body:not(.locked) .toolbar {
+      margin-left: 0 !important;
+    }
+  }
+
+  /* ============================================================
+     CORREÇÕES FINAIS — versão limpa
+     ============================================================ */
+
+  /* ─────────────────────────────────────────
+     SIDEBAR — scrollbar contida via wrapper interno
+     Solução robusta: o <aside class="sidebar"> tem overflow:hidden
+     com border-radius (corta tudo nos cantos arredondados).
+     O <div class="sidebar-inner"> dentro dele tem overflow-y:auto
+     SEM border-radius — a scrollbar é renderizada nele e fica
+     naturalmente dentro da área já cortada.
+     ───────────────────────────────────────── */
+  .sidebar {
+    overflow: hidden !important;
+    padding: 0 !important;
+    /* Sem mask-image — não precisa mais */
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+  .sidebar-inner {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1.4rem 0 6rem;
+  }
+
+  /* Scrollbar customizada no wrapper interno */
+  .sidebar-inner::-webkit-scrollbar {
+    width: 4px;
+  }
+  .sidebar-inner::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .sidebar-inner::-webkit-scrollbar-thumb {
+    background: rgba(232, 221, 200, 0);
+    border-radius: 10px;
+    transition: background 0.3s;
+  }
+  .sidebar:hover .sidebar-inner::-webkit-scrollbar-thumb {
+    background: rgba(232, 221, 200, 0.22);
+  }
+  .sidebar-inner {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(232, 221, 200, 0.12) transparent;
+  }
+
+  /* Reativa o reflexo de luz no topo do sidebar (reflexo glass) */
+  .sidebar::before {
+    display: block !important;
+  }
+
+  /* ─────────────────────────────────────────
+     MICROTAREFAS — fundo glass garantido + padding pros botões
+     Reescrito limpo, sobrescrevendo TODAS as regras anteriores.
+     ───────────────────────────────────────── */
+  .checklist li {
+    /* Visibilidade garantida — opacity 1 em todos os estados base */
+    opacity: 1 !important;
+    display: list-item !important;
+    visibility: visible !important;
+
+    /* Glass background visível */
+    background: rgba(31, 47, 55, 0.55) !important;
+    backdrop-filter: blur(14px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.14) !important;
+    border-radius: 12px !important;
+
+    /* Layout: padding generoso à esquerda (checkmark) e à direita (botões) */
+    padding: 0.85rem 220px 0.85rem 2.2rem !important;
+    margin: 0 0 0.5rem 0 !important;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 2px 10px rgba(0, 0, 0, 0.12) !important;
+
+    position: relative !important;
+    overflow: visible !important;
+    cursor: pointer !important;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s !important;
+  }
+  .checklist li:hover {
+    background: rgba(31, 47, 55, 0.7) !important;
+    border-color: rgba(232, 221, 200, 0.22) !important;
+  }
+  /* Checkmark da tarefa */
+  .checklist li::before {
+    content: "✓" !important;
+    position: absolute !important;
+    left: 0.85rem !important;
+    top: 0.85rem !important;
+    color: var(--gold-dim) !important;
+    font-size: 0.85rem !important;
+    font-family: var(--font-mono) !important;
+    transition: color 0.2s !important;
+  }
+
+  /* ─────────────────────────────────────────
+     TAREFAS CONCLUÍDAS — base dourada visível + hover dramático
+     ───────────────────────────────────────── */
+  .checklist li.done {
+    opacity: 1 !important;
+    background: rgba(201, 138, 66, 0.22) !important;
+    border-color: rgba(201, 138, 66, 0.55) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 2px 12px rgba(201, 138, 66, 0.12) !important;
+  }
+  .checklist li.done strong {
+    color: #f0c87a !important;
+  }
+  .checklist li.done .task-meta {
+    color: rgba(240, 200, 122, 0.85) !important;
+    opacity: 1 !important;
+  }
+  .checklist li.done::before {
+    content: "■" !important;
+    color: var(--gold) !important;
+  }
+  .checklist li.done:hover {
+    background: rgba(201, 138, 66, 0.55) !important;
+    border-color: #f0c87a !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 0 0 2px rgba(201, 138, 66, 0.5),
+      0 12px 40px rgba(201, 138, 66, 0.45) !important;
+    transform: translateY(-2px) !important;
+  }
+  .checklist li.done:hover::before {
+    color: #ffd98a !important;
+    text-shadow: 0 0 12px rgba(255, 217, 138, 0.8) !important;
+  }
+  .checklist li.done:hover strong {
+    color: #fff5dc !important;
+  }
+  .checklist li.done:hover .task-meta {
+    color: #ffe5a8 !important;
+  }
+
+  /* ─────────────────────────────────────────
+     BOTÕES DA TAREFA — linha horizontal compacta, sempre visíveis
+     Layout: avatar · prioridade · comentário · prazo (flat horizontal)
+     ───────────────────────────────────────── */
+  .task-actions {
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .assignee-badge,
+  .priority-btn,
+  .comment-btn {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 !important;
+    padding: 0 !important;
+    font-size: 0.68rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    /* Glass leve em cada botão (em vez de container envolvente) */
+    background: rgba(31, 47, 55, 0.5) !important;
+    backdrop-filter: blur(8px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.16) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    transition: background 0.15s, border-color 0.15s !important;
+  }
+  .assignee-badge:hover,
+  .priority-btn:hover,
+  .comment-btn:hover {
+    background: rgba(31, 47, 55, 0.85) !important;
+    border-color: rgba(232, 221, 200, 0.3) !important;
+  }
+  .deadline-btn {
+    height: 24px !important;
+    padding: 0 0.6rem !important;
+    border-radius: 12px !important;
+    font-size: 0.64rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    background: rgba(31, 47, 55, 0.5) !important;
+    backdrop-filter: blur(8px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.16) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  }
+  .deadline-btn:hover {
+    background: rgba(31, 47, 55, 0.85) !important;
+    border-color: rgba(232, 221, 200, 0.3) !important;
+  }
+
+  /* Em telas estreitas, botões viram linha embaixo do texto */
+  @media (max-width: 1100px) {
+    .checklist li {
+      padding-right: 1rem !important;
+    }
+    .task-actions {
+      position: static !important;
+      transform: none !important;
+      margin-top: 0.6rem !important;
+      flex-wrap: wrap !important;
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     REMOVER BOXES DAS FASES E STEPS — texto solto, sem container
+     ───────────────────────────────────────── */
+  .phase-block::before {
+    display: none !important;
+  }
+  .step, .track {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 1.5rem 0 !important;
+  }
+
+  /* ─────────────────────────────────────────
+     TOOLBAR — header sticky horizontal full width
+     Forçar largura via width:auto + left+right (em vez de só left)
+     ───────────────────────────────────────── */
+  .toolbar {
+    /* Ilha flutuante — largura pelo conteúdo, alinhada à direita */
+    position: fixed !important;
+    top: 18px !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: 18px !important;
+    width: auto !important;
+    max-width: calc(100vw - var(--sidebar-width) - var(--sidebar-margin) * 2 - 16px) !important;
+    min-width: 0 !important;
+
+    /* Layout horizontal */
+    height: 56px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+    padding: 0 1.4rem !important;
+    margin: 0 !important;
+
+    /* Glass intensificado pra ilha (matching sidebar) */
+    background: rgba(13, 21, 25, 0.55) !important;
+    backdrop-filter: blur(24px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.28) !important;
+    border-radius: 22px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 20px 60px rgba(0, 0, 0, 0.55),
+      0 8px 24px rgba(0, 0, 0, 0.35),
+      0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden !important;
+  }
+  /* Reflexo de luz no topo (estilo glass Apple) */
+  .toolbar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+    pointer-events: none;
+    border-radius: 20px 20px 0 0;
+  }
+
+  /* Sobrescreve o max-height: 0 da definição original */
+  .toolbar-actions {
+    max-height: none !important;
+    overflow: visible !important;
+    border-top: none !important;
+    display: flex !important;
+    flex-shrink: 0 !important;
+    gap: 0.4rem !important;
+    padding: 0 !important;
+    align-items: center !important;
+  }
+  .toolbar-action {
+    width: auto !important;
+    border-bottom: none !important;
+    padding: 0.4rem 0.7rem !important;
+    font-size: 0.65rem !important;
+    white-space: nowrap !important;
+    border-radius: 6px !important;
+    background: rgba(13, 21, 25, 0.3) !important;
+  }
+  .toolbar-action:hover {
+    background: rgba(13, 21, 25, 0.6) !important;
+  }
+  .toolbar-action .arrow {
+    margin-left: 0.3rem !important;
+  }
+
+  .toolbar-summary {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+    padding: 0 !important;
+    border-bottom: none !important;
+    cursor: default !important;
+  }
+  .toolbar-summary > div:first-child {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 0.5rem !important;
+  }
+  .toolbar-label {
+    font-size: 0.6rem !important;
+    margin-bottom: 0 !important;
+    white-space: nowrap !important;
+  }
+  .toolbar-counter {
+    font-size: 1rem !important;
+  }
+  .toolbar-progress { display: none !important; }
+  .toolbar-summary > span:last-child,
+  .toolbar-summary svg {
+    display: none !important;
+  }
+
+  /* Filter rows */
+  .filter-row {
+    display: flex !important;
+    flex: 0 1 auto !important;
+    border: none !important;
+    border-top: none !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    height: 32px !important;
+    background: rgba(13, 21, 25, 0.4) !important;
+    margin: 0 !important;
+  }
+  .filter-btn {
+    flex: 1 !important;
+    padding: 0 0.7rem !important;
+    border-right: 1px solid rgba(232, 221, 200, 0.12) !important;
+    font-size: 0.6rem !important;
+    white-space: nowrap !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .filter-btn:last-child {
+    border-right: none !important;
+  }
+
+  .toolbar-meta {
+    font-size: 0.58rem !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    border-top: none !important;
+    padding: 0 !important;
+    margin-left: auto !important;
+  }
+
+  /* Separador entre summary e filtros */
+  .toolbar-summary::after {
+    content: "";
+    width: 1px;
+    height: 24px;
+    background: rgba(232, 221, 200, 0.12);
+    margin-left: 0.6rem;
+  }
+
+  /* Empurra o conteúdo principal pra baixo */
+  body:not(.locked) main {
+    padding-top: 80px !important;
+  }
+
+  @media (max-width: 1100px) {
+    .toolbar {
+      flex-wrap: wrap !important;
+      height: auto !important;
+      padding: 0.5rem 0.8rem !important;
+      gap: 0.5rem !important;
+    }
+    .toolbar-meta { display: none !important; }
+    body:not(.locked) main {
+      padding-top: 110px !important;
+    }
+  }
+  @media (max-width: 1000px) {
+    .toolbar {
+      left: var(--sidebar-margin) !important;
+    }
+    body:not(.locked) main,
+    body:not(.locked) .toolbar {
+      margin-left: 0 !important;
+    }
+  }
+
+
+  /* Esconde botões de Exportar/Importar/Reset e meta de última atualização */
+  .toolbar-actions,
+  .toolbar-meta {
+    display: none !important;
+  }
+
+  /* ─────────────────────────────────────────
+     MOBILE — versão otimizada (telas estreitas)
+     ───────────────────────────────────────── */
+  @media (max-width: 900px) {
+    /* (1) SIDEBAR — escondida em mobile, só abre via toggle */
+    .sidebar {
+      transform: translateX(-110%) !important;
+      transition: transform 0.3s ease !important;
+    }
+    body.sidebar-open .sidebar {
+      transform: translateX(0) !important;
+    }
+    /* Quando sidebar aberta no mobile, esconde a toolbar pra não sobrepor */
+    body.sidebar-open .toolbar {
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: opacity 0.1s ease !important;
+    }
+    .toolbar {
+      transition: opacity 0.1s ease !important;
+    }
+    /* Hambúrguer é empurrado pra direita junto com a sidebar */
+    .sidebar-toggle {
+      transition: transform 0.3s ease, left 0.3s ease !important;
+    }
+    body.sidebar-open .sidebar-toggle {
+      transform: translateX(var(--sidebar-width)) !important;
+    }
+    .sidebar-toggle {
+      display: flex !important;
+      position: fixed !important;
+      top: 12px !important;
+      left: 12px !important;
+      z-index: 200 !important;
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 12px !important;
+      background: rgba(13, 21, 25, 0.7) !important;
+      backdrop-filter: blur(14px) saturate(140%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+      border: 1px solid rgba(232, 221, 200, 0.22) !important;
+      color: var(--cream-bright) !important;
+      font-size: 1.2rem !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+    }
+
+    /* Conteúdo principal e toolbar não têm mais margin-left */
+    body:not(.locked) main,
+    body:not(.locked) .toolbar {
+      margin-left: 0 !important;
+    }
+
+    /* (2) TOOLBAR — full width, todos os botões visíveis */
+    .toolbar {
+      top: 12px !important;
+      left: 68px !important; /* deixa espaço pro botão hambúrguer */
+      right: 12px !important;
+      width: auto !important;
+      max-width: none !important;
+      height: auto !important;
+      min-height: 44px !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+      padding: 8px 12px !important;
+      border-radius: 14px !important;
+    }
+    /* Esconde "Progresso geral" em mobile (espaço caro) — só os filtros importam */
+    .toolbar .toolbar-summary {
+      display: none !important;
+    }
+    .toolbar-summary::after {
+      display: none !important;
+    }
+    /* Filtros: ocupam toda a largura disponível, em uma única linha que pode quebrar */
+    .toolbar .filter-row {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      height: 30px !important;
+    }
+    .toolbar .filter-btn {
+      font-size: 0.55rem !important;
+      padding: 0 0.4rem !important;
+      height: 30px !important;
+    }
+
+    /* Empurra o conteúdo principal pra baixo da toolbar mobile */
+    body:not(.locked) main {
+      padding-top: 70px !important;
+    }
+
+    /* (3) BOTÕES DE TAREFA — alinhados à direita dentro do box,
+        em linha embaixo do texto */
+    .checklist li {
+      padding: 0.85rem 1rem 0.85rem 2.2rem !important;
+    }
+    .task-actions {
+      position: static !important;
+      transform: none !important;
+      margin-top: 0.6rem !important;
+      margin-left: auto !important;
+      width: fit-content !important;
+      max-width: 100% !important;
+      justify-content: flex-end !important;
+      flex-wrap: wrap !important;
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     CORES PREENCHIDAS — assignee e prioridade
+     ───────────────────────────────────────── */
+  /* Chiara — preenchido em ouro */
+  .assignee-badge.chiara {
+    background: var(--gold) !important;
+    border-color: var(--gold-bright) !important;
+    color: var(--bg-deep) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 0 12px rgba(200, 151, 90, 0.4) !important;
+  }
+  /* Barigchun — preenchido em marfim/cream */
+  .assignee-badge.barigchun {
+    background: var(--cream) !important;
+    border-color: var(--cream-bright) !important;
+    color: var(--bg-deep) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 0 12px rgba(232, 221, 200, 0.3) !important;
+  }
+
+  /* Prioridade Alta — vermelho */
+  .priority-btn.alta {
+    background: #b85454 !important;
+    border-color: #d68a8a !important;
+    color: #fff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 0 12px rgba(184, 84, 84, 0.5) !important;
+  }
+  /* Prioridade Média — amarelo (tom dourado pra harmonizar com o resto) */
+  .priority-btn.media {
+    background: #d4a52a !important;
+    border-color: #e8c050 !important;
+    color: var(--bg-deep) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 0 12px rgba(212, 165, 42, 0.45) !important;
+  }
+  /* Prioridade Baixa — verde */
+  .priority-btn.baixa {
+    background: #6ba368 !important;
+    border-color: #8ec78a !important;
+    color: #fff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 0 12px rgba(107, 163, 104, 0.5) !important;
+  }
+
+  /* ─────────────────────────────────────────
+     LOGIN — background transparente + card glass intenso
+     A imagem do Tahoe e a animação de blobs aparecem atrás.
+     O card central tem glass igual ao sidebar/toolbar.
+     ───────────────────────────────────────── */
+  .login-gate {
+    background: transparent !important;
+  }
+  .login-gate::before {
+    /* Mantém apenas leve atmosfera dourada por cima da imagem */
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(200, 151, 90, 0.1), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(70, 98, 112, 0.15), transparent 60%) !important;
+  }
+  .login-card {
+    background: rgba(13, 21, 25, 0.35) !important;
+    backdrop-filter: blur(28px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    border: 1px solid rgba(232, 221, 200, 0.28) !important;
+    border-radius: 22px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 24px 80px rgba(0, 0, 0, 0.55),
+      0 8px 24px rgba(0, 0, 0, 0.35) !important;
+    overflow: hidden !important;
+  }
+  /* Reflexo de luz no topo (glass Apple) */
+  .login-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
+    pointer-events: none;
+    border-radius: 22px 22px 0 0;
+  }
+
+
+
+  /* Camada de luz residual */
+  html body::after {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+    background:
+      radial-gradient(ellipse 600px 400px at 80% 20%, rgba(200, 151, 90, 0.05), transparent 60%),
+      radial-gradient(ellipse 500px 300px at 15% 80%, rgba(70, 98, 112, 0.08), transparent 60%) !important;
+    opacity: 1 !important;
+    mix-blend-mode: normal !important;
+    z-index: 2 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Conteúdo principal acima das camadas de fundo */
+  html body main {
+    position: relative !important;
+    z-index: 3 !important;
+  }
+
+  /* Scrollbar da sidebar movida para o lado esquerdo via direction trick.
+     IMPORTANTE: o scroll real acontece em .sidebar-inner (wrapper interno),
+     não em .sidebar — a sidebar tem overflow:hidden pra cortar nos cantos
+     arredondados. Por isso o rtl precisa estar no inner. */
+  html body .sidebar { direction: ltr !important; }
+  html body .sidebar-inner { direction: rtl !important; }
+  html body .sidebar-inner > * { direction: ltr !important; }
+
+</style>
+</head>
+
+<!-- Estilos adicionais só para o briefing (campos de formulário) -->
+<style>
+  /* ============ FORM FIELDS — briefing specific ============ */
+  .block {
+    padding: 5rem 0;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .block:first-of-type { border-top: none; }
+  .block-marker { position: sticky; top: 2rem; }
+  .block-num {
+    font-family: var(--font-display);
+    color: var(--gold);
+    font-size: clamp(3rem, 5vw, 4.2rem);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .block-label {
+    font-family: var(--font-mono);
+    color: var(--text-soft);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .block-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: 1.2rem;
+    letter-spacing: -0.01em;
+  }
+  .block-title em { font-style: italic; color: var(--gold); }
+  .block-intro {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--text);
+    font-size: 1.1rem;
+    line-height: 1.55;
+    margin-bottom: 2.6rem;
+    max-width: 680px;
+  }
+  .block-intro em { color: var(--gold); font-style: normal; font-family: var(--font-body); font-size: 0.92em; }
+
+  /* NOTICE BOX */
+  .notice {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 2.2rem 2.4rem;
+    margin: 2.5rem 0;
+    position: relative;
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 20px rgba(0,0,0,0.18);
+    overflow: hidden;
+  }
+  .notice::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+    border-radius: 16px 0 0 16px;
+  }
+  .notice::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+    pointer-events: none;
+  }
+  .notice-label {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .notice-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+  .notice-title em { font-style: italic; color: var(--gold); }
+  .notice-text { color: var(--text); font-size: 0.96rem; line-height: 1.7; }
+  .notice-text + .notice-text { margin-top: 0.9rem; }
+  .notice.danger {
+    background: rgba(200, 122, 90, 0.1);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border-color: rgba(200, 122, 90, 0.3);
+  }
+  .notice.danger::before { background: var(--danger, #c87a5a); }
+  .notice.danger .notice-label { color: var(--danger, #c87a5a); }
+
+  /* FORM FIELDS */
+  .field { margin-bottom: 1.8rem; }
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    color: var(--cream);
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 0.55rem;
+  }
+  .field-label .req { color: var(--gold); margin-left: 0.25rem; }
+  .field-help {
+    display: block;
+    font-family: var(--font-body);
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-style: italic;
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .field input[type="text"],
+  .field input[type="email"],
+  .field input[type="tel"],
+  .field input[type="url"],
+  .field input[type="number"],
+  .field textarea,
+  .field select {
+    width: 100%;
+    background: rgba(13, 21, 25, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--cream);
+    padding: 0.85rem 1.05rem;
+    font-family: var(--font-body);
+    font-size: 0.96rem;
+    font-weight: 300;
+    line-height: 1.5;
+    transition: border 0.3s, background 0.3s;
+    outline: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--gold-dim);
+    background: rgba(13, 21, 25, 0.7);
+  }
+  .field textarea { resize: vertical; min-height: 90px; }
+  .field textarea.tall { min-height: 140px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* OPTION PILLS */
+  .options-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.3rem; }
+  .option-pill { position: relative; display: inline-flex; align-items: center; }
+  .option-pill input[type="radio"],
+  .option-pill input[type="checkbox"] { position: absolute; opacity: 0; pointer-events: none; }
+  .option-pill label {
+    cursor: pointer;
+    padding: 0.55rem 1.1rem;
+    background: rgba(13, 21, 25, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: all 0.25s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .option-pill input:checked + label {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(200, 151, 90, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(200,151,90,0.15);
+  }
+  .option-pill label:hover { border-color: var(--gold-dim); background: rgba(13,21,25,0.7); }
+
+  /* PERSON CARD */
+  .person-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 2rem;
+    margin-bottom: 1.6rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 20px rgba(0,0,0,0.18);
+  }
+  .person-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+    pointer-events: none;
+  }
+  .person-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.6rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .person-card-num {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .person-card-remove {
+    background: rgba(13,21,25,0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .person-card-remove:hover { color: #c87a5a; border-color: rgba(200,122,90,0.4); }
+
+  .add-person {
+    width: 100%;
+    background: rgba(13,21,25,0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px dashed var(--gold-line);
+    border-radius: 14px;
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+  .add-person:hover { border-color: var(--gold); background: rgba(200,151,90,0.06); }
+  .add-person::before { content: "+ "; color: var(--gold); }
+
+  /* CLOSING */
+  .closing {
+    padding: 8rem 5vw;
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  .closing-eyebrow {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+  .closing-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+  }
+  .closing-title em { font-style: italic; color: var(--gold); }
+  .closing-sub {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--text);
+    max-width: 720px;
+    margin: 0 auto 3rem;
+    line-height: 1.55;
+  }
+  .closing-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .closing-btn {
+    background: rgba(13,21,25,0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--gold);
+    border-radius: 14px;
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .closing-btn:hover { background: rgba(200,151,90,0.1); color: var(--cream-bright); }
+
+  /* PROGRESS BAR (sidebar briefing) */
+  .sidebar-progress-wrap {
+    padding: 0.8rem 1.4rem 1.2rem;
+    border-bottom: 1px solid var(--border-soft);
+    margin-bottom: 1rem;
+  }
+  .sidebar-progress-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  .sidebar-progress-bar { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+  .sidebar-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright));
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 0%;
+  }
+
+  /* Override sidebar nav for briefing (simpler — no phase/step tree) */
+  .sidebar-briefing-nav { padding: 0; }
+  .sidebar-briefing-nav .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.55rem 1.4rem;
+  }
+  .sidebar-briefing-nav .sidebar-link-num {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    width: 22px;
+  }
+
+  /* SIDEBAR ACTIONS */
+  .sidebar-actions-brief {
+    padding: 1.2rem 1.4rem;
+    border-top: 1px solid var(--border-soft);
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .sidebar-action-btn {
+    background: rgba(13,21,25,0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: left;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .sidebar-action-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .sidebar-action-btn.primary { border-color: var(--gold); color: var(--gold); background: rgba(200,151,90,0.06); }
+  .sidebar-action-btn.primary:hover { background: rgba(200,151,90,0.12); }
+
+  @media (max-width: 900px) {
+    .block { grid-template-columns: 1fr; gap: 1.6rem; }
+    .block-marker { position: relative; top: 0; }
+    .field-row, .field-row.three { grid-template-columns: 1fr; }
+  }
+</style>
+<body class="locked">
+
+<!-- LOGIN GATE — idêntico ao painel -->
+<div class="login-gate" id="loginGate">
+  <div class="login-card">
+    <div class="login-eyebrow">La Vie en Rose</div>
+    <h1 class="login-title">Briefing</h1>
+    <p class="login-subtitle">Operacional &amp; Acessos · Acesso restrito</p>
+    <input type="password" class="login-input" id="loginInput" placeholder="Senha de acesso" autocomplete="current-password" autofocus />
+    <button class="login-btn" id="loginBtn">Entrar</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">Sincronização em nuvem · Supabase</div>
+  </div>
+</div>
+
+<!-- SIDEBAR — estrutura idêntica ao painel -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menu">☰</button>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-inner">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-eyebrow">LVR · Briefing</div>
+      <div class="sidebar-brand-title">La Vie en Rose</div>
+      <div class="sidebar-brand-sub">Operacional &amp; Acessos</div>
+    </div>
+
+    <div class="sidebar-progress-wrap">
+      <div class="sidebar-progress-label">
+        <span>Progresso</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="sidebar-progress-bar">
+        <div class="sidebar-progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">— Blocos —</div>
+    <nav class="sidebar-briefing-nav">
+      <a class="sidebar-link" href="#bloco-01"><span class="sidebar-link-num">01</span>Identidade jurídica</a>
+      <a class="sidebar-link" href="#bloco-02"><span class="sidebar-link-num">02</span>Endereços &amp; horários</a>
+      <a class="sidebar-link" href="#bloco-03"><span class="sidebar-link-num">03</span>Equipe</a>
+      <a class="sidebar-link" href="#bloco-04"><span class="sidebar-link-num">04</span>Telefonia &amp; atendimento</a>
+      <a class="sidebar-link" href="#bloco-05"><span class="sidebar-link-num">05</span>Agenda &amp; calendário</a>
+      <a class="sidebar-link" href="#bloco-06"><span class="sidebar-link-num">06</span>Fluxo de agendamento</a>
+      <a class="sidebar-link" href="#bloco-07"><span class="sidebar-link-num">07</span>WhatsApp na prática</a>
+      <a class="sidebar-link" href="#bloco-08"><span class="sidebar-link-num">08</span>Visão para o bot</a>
+      <a class="sidebar-link" href="#bloco-09"><span class="sidebar-link-num">09</span>Plataformas ativas</a>
+      <a class="sidebar-link" href="#bloco-10"><span class="sidebar-link-num">10</span>Domínio &amp; e-mails</a>
+      <a class="sidebar-link" href="#bloco-11"><span class="sidebar-link-num">11</span>Sistemas internos</a>
+      <a class="sidebar-link" href="#bloco-12"><span class="sidebar-link-num">12</span>Materiais existentes</a>
+      <a class="sidebar-link" href="#bloco-13"><span class="sidebar-link-num">13</span>Parceiros &amp; fornecedores</a>
+      <a class="sidebar-link" href="#bloco-14"><span class="sidebar-link-num">14</span>Histórico &amp; campanhas</a>
+      <a class="sidebar-link" href="#bloco-15"><span class="sidebar-link-num">15</span>Indicadores operacionais</a>
+    </nav>
+
+    <div class="sidebar-actions-brief">
+      <button class="sidebar-action-btn primary" onclick="exportAnswers()">Exportar respostas</button>
+      <button class="sidebar-action-btn" onclick="importAnswers()">Importar respostas</button>
+      <input type="file" id="importInput" accept=".json" style="display:none" />
+      <button class="sidebar-action-btn" onclick="window.print()">Imprimir / PDF</button>
+      <button class="sidebar-action-btn" onclick="resetAnswers()">Resetar tudo</button>
+    </div>
+  </div>
+</aside>
+
+<div class="sync-indicator" id="syncIndicator">
+  <span class="sync-dot"></span>
+  <span id="syncText">Sincronizado</span>
+</div>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-top">
+      <div class="brand"><span class="brand-mono">LVR</span>La Vie en Rose · Clínica de Saúde Mental</div>
+
+    </div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Briefing · Operacional &amp; Acessos</div>
+      <h1 class="hero-title">A base <em>antes</em><br/>da construção.</h1>
+      <p class="hero-sub">Antes da identidade visual, antes do site, antes do bot — <em>os dados que sustentam tudo.</em> Este formulário coleta o que vamos precisar para integrar os sistemas existentes da clínica ao novo ecossistema digital.</p>
+    </div>
+    <div class="hero-bottom">
+      <div class="scroll-hint"><span class="line"></span><span>Role para começar</span></div>
+      <div>Documento 01 de 02 · ~60 min</div>
+    </div>
+  </section>
+
+  <!-- BLOCOS -->
+  <section class="section">
+
+    <!-- BLOCO 01 -->
+    <div class="block" id="bloco-01">
+      <div class="block-marker"><div class="block-num">01</div><div class="block-label">Identidade jurídica</div></div>
+      <div class="block-body">
+        <h3 class="block-title">A clínica <em>no papel</em>.</h3>
+        <p class="block-intro">Dados oficiais da empresa — usados em contratos, notas fiscais, documentos legais e termos do site.</p>
+        <div class="field"><label class="field-label">Razão social <span class="req">*</span></label><input type="text" data-field="b01_razao_social" placeholder="Ex: La Vie en Rose Clínica de Saúde Mental Ltda." /></div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Nome fantasia <span class="req">*</span></label><input type="text" data-field="b01_fantasia" placeholder="Ex: Clínica La Vie en Rose" /></div>
+          <div class="field"><label class="field-label">CNPJ <span class="req">*</span></label><input type="text" data-field="b01_cnpj" placeholder="00.000.000/0000-00" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Inscrição estadual</label><span class="field-help">Deixe em branco se isenta.</span><input type="text" data-field="b01_ie" placeholder="—" /></div>
+          <div class="field"><label class="field-label">Inscrição municipal</label><input type="text" data-field="b01_im" placeholder="—" /></div>
+        </div>
+        <div class="field">
+          <label class="field-label">Regime tributário</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b01_regime" id="b01_r1" data-field="b01_regime" value="Simples Nacional" /><label for="b01_r1">Simples Nacional</label></span>
+            <span class="option-pill"><input type="radio" name="b01_regime" id="b01_r2" data-field="b01_regime" value="Lucro Presumido" /><label for="b01_r2">Lucro Presumido</label></span>
+            <span class="option-pill"><input type="radio" name="b01_regime" id="b01_r3" data-field="b01_regime" value="Lucro Real" /><label for="b01_r3">Lucro Real</label></span>
+            <span class="option-pill"><input type="radio" name="b01_regime" id="b01_r4" data-field="b01_regime" value="Não sei" /><label for="b01_r4">Não sei</label></span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Contador responsável</label><input type="text" data-field="b01_contador_nome" placeholder="Nome completo" /></div>
+          <div class="field"><label class="field-label">Contato do contador</label><span class="field-help">E-mail e/ou telefone.</span><input type="text" data-field="b01_contador_contato" placeholder="email@exemplo.com / (00) 00000-0000" /></div>
+        </div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b01_obs" placeholder="Dúvidas, peculiaridades, anotações..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 02 -->
+    <div class="block" id="bloco-02">
+      <div class="block-marker"><div class="block-num">02</div><div class="block-label">Endereços &amp; horários</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Onde a clínica <em>acontece</em>.</h3>
+        <p class="block-intro">Endereços completos das unidades, horários de funcionamento e informações de logística para o Google Business, site e materiais.</p>
+        <div class="field"><label class="field-label">Sede principal — endereço completo <span class="req">*</span></label><span class="field-help">Rua, número, complemento, bairro, cidade, estado, CEP.</span><textarea data-field="b02_sede_endereco" placeholder="Ex: Rua Cruzeiro do Sul, 248 — Vila Oliveira — Mogi das Cruzes/SP — CEP 08790-170"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Ponto de referência</label><input type="text" data-field="b02_sede_referencia" placeholder="Ex: em frente ao parque municipal" /></div>
+          <div class="field">
+            <label class="field-label">Estacionamento</label>
+            <div class="options-row">
+              <span class="option-pill"><input type="radio" name="b02_estac" id="b02_e1" data-field="b02_estac" value="Próprio gratuito" /><label for="b02_e1">Próprio · grátis</label></span>
+              <span class="option-pill"><input type="radio" name="b02_estac" id="b02_e2" data-field="b02_estac" value="Conveniado" /><label for="b02_e2">Conveniado</label></span>
+              <span class="option-pill"><input type="radio" name="b02_estac" id="b02_e3" data-field="b02_estac" value="Rua" /><label for="b02_e3">Apenas rua</label></span>
+              <span class="option-pill"><input type="radio" name="b02_estac" id="b02_e4" data-field="b02_estac" value="Não" /><label for="b02_e4">Não há</label></span>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Acessibilidade</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="checkbox" id="b02_a1" data-field="b02_acess_cadeira" value="true" /><label for="b02_a1">Acesso cadeirante</label></span>
+            <span class="option-pill"><input type="checkbox" id="b02_a2" data-field="b02_acess_elevador" value="true" /><label for="b02_a2">Elevador</label></span>
+            <span class="option-pill"><input type="checkbox" id="b02_a3" data-field="b02_acess_banheiro" value="true" /><label for="b02_a3">Banheiro adaptado</label></span>
+            <span class="option-pill"><input type="checkbox" id="b02_a4" data-field="b02_acess_libras" value="true" /><label for="b02_a4">Atendimento em Libras</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Unidade(s) secundária(s)</label><span class="field-help">Se houver outra unidade física (ex: Salvador) ou exclusivamente online.</span><textarea data-field="b02_unidades" class="tall" placeholder="Ex: Unidade Salvador (Rua Marquês de Caravelas, 407 — Barra) — operando em modalidade online."></textarea></div>
+        <div class="field"><label class="field-label">Horários de funcionamento <span class="req">*</span></label><span class="field-help">Liste por dia da semana, com intervalos. Inclua se atendem feriados.</span><textarea data-field="b02_horarios" class="tall" placeholder="Ex:&#10;Segunda a sexta: 08h às 18h (intervalo 12h-13h)&#10;Sábado: 08h às 12h&#10;Domingo: fechado"></textarea></div>
+        <div class="field">
+          <label class="field-label">Modalidades de atendimento <span class="req">*</span></label>
+          <div class="options-row">
+            <span class="option-pill"><input type="checkbox" id="b02_m1" data-field="b02_mod_presencial" value="true" /><label for="b02_m1">Presencial</label></span>
+            <span class="option-pill"><input type="checkbox" id="b02_m2" data-field="b02_mod_online" value="true" /><label for="b02_m2">Online</label></span>
+            <span class="option-pill"><input type="checkbox" id="b02_m3" data-field="b02_mod_domiciliar" value="true" /><label for="b02_m3">Domiciliar</label></span>
+            <span class="option-pill"><input type="checkbox" id="b02_m4" data-field="b02_mod_internacional" value="true" /><label for="b02_m4">Internacional (telemedicina)</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b02_obs" placeholder="Particularidades de logística, restrições, etc."></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 03 -->
+    <div class="block" id="bloco-03">
+      <div class="block-marker"><div class="block-num">03</div><div class="block-label">Equipe</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Quem <em>compõe</em> a clínica.</h3>
+        <p class="block-intro">Dados completos de cada profissional e colaborador. Comece pelo Dr. Bruno, depois demais profissionais, secretária(s) e equipe de apoio.</p>
+        <div id="people-container"></div>
+        <button class="add-person" type="button" onclick="addPerson()">Adicionar pessoa</button>
+        <div class="field" style="margin-top:2.5rem;"><label class="field-label">Observações sobre a equipe</label><span class="field-help">Há terceirizados, freelancers que atuam como se fossem equipe?</span><textarea data-field="b03_obs" placeholder="Ex: usamos uma psicóloga colaboradora externa às terças..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 04 -->
+    <div class="block" id="bloco-04">
+      <div class="block-marker"><div class="block-num">04</div><div class="block-label">Telefonia &amp; atendimento</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Como o paciente <em>chega</em> até vocês hoje.</h3>
+        <p class="block-intro">Mapeamento dos canais ativos de atendimento, com volume estimado e gargalos honestos — sem maquiagem. <em>Quanto mais real for o diagnóstico, melhor o desenho do bot.</em></p>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Telefone fixo principal</label><input type="tel" data-field="b04_fixo" placeholder="(11) 0000-0000" /></div>
+          <div class="field"><label class="field-label">WhatsApp principal <span class="req">*</span></label><span class="field-help">Número que aparece em todos os materiais.</span><input type="tel" data-field="b04_whats" placeholder="(11) 90000-0000" /></div>
+        </div>
+        <div class="field">
+          <label class="field-label">WhatsApp Business verificado (selo verde)?</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b04_verif" id="b04_v1" data-field="b04_verif" value="Sim, com selo verde" /><label for="b04_v1">Sim, selo verde</label></span>
+            <span class="option-pill"><input type="radio" name="b04_verif" id="b04_v2" data-field="b04_verif" value="Tem Business mas sem selo" /><label for="b04_v2">Business sem selo</label></span>
+            <span class="option-pill"><input type="radio" name="b04_verif" id="b04_v3" data-field="b04_verif" value="WhatsApp pessoal comum" /><label for="b04_v3">Pessoal comum</label></span>
+            <span class="option-pill"><input type="radio" name="b04_verif" id="b04_v4" data-field="b04_verif" value="Não sei" /><label for="b04_v4">Não sei</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Outros números de telefone usados?</label><span class="field-help">Ex: número do Dr. Bruno separado, número de emergência.</span><textarea data-field="b04_outros_tels" placeholder="Ex: (11) 90000-0001 — Dr. Bruno (pessoal, casos urgentes)"></textarea></div>
+        <div class="field"><label class="field-label">Quem responde os contatos? Em quais horários?</label><textarea data-field="b04_quem_responde" class="tall" placeholder="Ex:&#10;Manhã (8h-12h): secretária (WhatsApp + telefone)&#10;Tarde (13h-18h): secretária&#10;Fora do horário: nenhuma resposta"></textarea></div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Tempo médio de resposta</label>
+            <div class="options-row">
+              <span class="option-pill"><input type="radio" name="b04_tempo" id="b04_t1" data-field="b04_tempo" value="Imediato (< 5 min)" /><label for="b04_t1">&lt; 5 min</label></span>
+              <span class="option-pill"><input type="radio" name="b04_tempo" id="b04_t2" data-field="b04_tempo" value="Até 30 min" /><label for="b04_t2">Até 30 min</label></span>
+              <span class="option-pill"><input type="radio" name="b04_tempo" id="b04_t3" data-field="b04_tempo" value="Até 2h" /><label for="b04_t3">Até 2h</label></span>
+              <span class="option-pill"><input type="radio" name="b04_tempo" id="b04_t4" data-field="b04_tempo" value="Mesmo dia" /><label for="b04_t4">Mesmo dia</label></span>
+              <span class="option-pill"><input type="radio" name="b04_tempo" id="b04_t5" data-field="b04_tempo" value="Dia seguinte ou mais" /><label for="b04_t5">Dia seguinte+</label></span>
+            </div>
+          </div>
+          <div class="field"><label class="field-label">Volume estimado de contatos/dia</label><span class="field-help">Soma de WhatsApp + telefone + Doctoralia + Instagram.</span><input type="text" data-field="b04_volume" placeholder="Ex: 25 a 40 contatos/dia" /></div>
+        </div>
+        <div class="field"><label class="field-label">Os 3 tipos de mensagem mais recebidos hoje</label><textarea data-field="b04_mensagens_top3" class="tall" placeholder="Ex:&#10;1. Pedidos de renovação de receita&#10;2. Agendamento de primeira consulta&#10;3. Dúvidas sobre valores e formas de pagamento"></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04_obs" placeholder="Onde o gargalo dói mais hoje?"></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 05 -->
+    <div class="block" id="bloco-05">
+      <div class="block-marker"><div class="block-num">05</div><div class="block-label">Agenda &amp; calendário</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Onde a <em>agenda</em> mora hoje.</h3>
+        <p class="block-intro">A agenda é o coração da operação — e também onde mais nasce confusão quando há mais de um sistema em paralelo. <em>Para o auto-agendamento da Fase 02 funcionar, precisamos entender como ela opera hoje.</em></p>
+        <div class="field">
+          <label class="field-label">Onde "vive" a agenda principal hoje? <span class="req">*</span></label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b04a_onde" id="b04a_o1" data-field="b04a_onde" value="Doctoralia" /><label for="b04a_o1">Doctoralia</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_onde" id="b04a_o2" data-field="b04a_onde" value="Google Calendar" /><label for="b04a_o2">Google Calendar</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_onde" id="b04a_o3" data-field="b04a_onde" value="iClinic" /><label for="b04a_o3">iClinic</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_onde" id="b04a_o4" data-field="b04a_onde" value="Outlook Calendar" /><label for="b04a_o4">Outlook</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_onde" id="b04a_o5" data-field="b04a_onde" value="Agenda física / papel" /><label for="b04a_o5">Agenda física</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_onde" id="b04a_o6" data-field="b04a_onde" value="Planilha" /><label for="b04a_o6">Planilha</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_onde" id="b04a_o7" data-field="b04a_onde" value="Outro sistema" /><label for="b04a_o7">Outro</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Se marcou "outro" — qual?</label><input type="text" data-field="b04a_outro_qual" placeholder="Nome do sistema" /></div>
+        <div class="field">
+          <label class="field-label">A agenda é compartilhada entre você e os profissionais? <span class="req">*</span></label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b04a_comp" id="b04a_c1" data-field="b04a_compartilhada" value="Sim, todos veem a mesma" /><label for="b04a_c1">Sim, todos veem</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_comp" id="b04a_c2" data-field="b04a_compartilhada" value="Parcialmente — alguns veem" /><label for="b04a_c2">Parcialmente</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_comp" id="b04a_c3" data-field="b04a_compartilhada" value="Não — cada um tem a sua" /><label for="b04a_c3">Cada um tem a sua</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Existe mais de uma agenda em paralelo?</label><textarea data-field="b04a_paralelas" class="tall" placeholder="Ex: Dr. Bruno tem Google Calendar pessoal, eu opero no Doctoralia. Às vezes batem em conflito."></textarea></div>
+        <div class="field">
+          <label class="field-label">Considerariam migrar tudo para o Google Calendar?</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b04a_mig" id="b04a_m1" data-field="b04a_migrar_google" value="Sim, abertura total" /><label for="b04a_m1">Abertura total</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_mig" id="b04a_m2" data-field="b04a_migrar_google" value="Sim, mas com receio" /><label for="b04a_m2">Sim, com receio</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_mig" id="b04a_m3" data-field="b04a_migrar_google" value="Prefiro manter o atual" /><label for="b04a_m3">Prefiro o atual</label></span>
+            <span class="option-pill"><input type="radio" name="b04a_mig" id="b04a_m4" data-field="b04a_migrar_google" value="Não sei avaliar" /><label for="b04a_m4">Não sei avaliar</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Quantos calendários distintos precisariam?</label><span class="field-help">Ex: agenda do Dr. Bruno (presencial), agenda do Dr. Bruno (online), agenda de procedimentos (Cetamina, Spravato).</span><textarea data-field="b04a_calendarios" class="tall" placeholder="Liste um por linha."></textarea></div>
+        <div class="field"><label class="field-label">Bloqueios fixos na agenda</label><span class="field-help">Almoço, dia de descanso, horário de supervisão, atendimento internacional em fuso específico.</span><textarea data-field="b04a_bloqueios" class="tall" placeholder="Ex:&#10;Dr. Bruno: terças e quintas 12h-14h (almoço)&#10;Sextas após 16h: reservado para estudo"></textarea></div>
+        <div class="field"><label class="field-label">Duração padrão das consultas, por tipo</label><textarea data-field="b04a_duracoes" class="tall" placeholder="Ex:&#10;Primeira consulta: 90 min (Slow Medicine)&#10;Retorno: 50 min&#10;Procedimento Cetamina: 2h30&#10;Telemedicina retorno: 40 min"></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04a_obs" placeholder="Exceções, pessoas que mexem fora do combinado, etc."></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 06 -->
+    <div class="block" id="bloco-06">
+      <div class="block-marker"><div class="block-num">06</div><div class="block-label">Fluxo de agendamento</div></div>
+      <div class="block-body">
+        <h3 class="block-title">O <em>raciocínio</em> por trás de cada marcação.</h3>
+        <p class="block-intro">Este é o bloco mais importante do briefing. Descreva com o máximo de detalhe possível como você decide o que decide — é exatamente essa lógica que vai virar o cérebro do bot. <em>O bot só será bom se conseguir copiar o que você já faz bem.</em></p>
+        <div class="field"><label class="field-label">Quando alguém pede consulta — passo 1? Passo 2? Passo 3? <span class="req">*</span></label><span class="field-help">Descreva como se estivesse ensinando alguém novo.</span><textarea data-field="b04b_passos" class="tall" placeholder="Ex:&#10;1. Pergunto se é primeira vez ou retorno&#10;2. Se primeira vez, pergunto qual a queixa principal&#10;3. Confirmo se prefere presencial ou online&#10;4. Mando opções de horário..."></textarea></div>
+        <div class="field"><label class="field-label">Como descobre se é paciente novo ou retorno?</label><textarea data-field="b04b_novo_retorno" placeholder="Há lista? Você confia na pessoa quando ela diz? Verifica por CPF?"></textarea></div>
+        <div class="field"><label class="field-label">Como decide para qual profissional encaminhar? <span class="req">*</span></label><textarea data-field="b04b_qual_profissional" class="tall" placeholder="Ex:&#10;Depressão resistente, TDAH adulto → Dr. Bruno&#10;Componente metabólico → endocrinologista + Dr. Bruno&#10;Sem diagnóstico → Dr. Bruno (triagem)"></textarea></div>
+        <div class="field"><label class="field-label">Você faz alguma triagem antes de agendar?</label><textarea data-field="b04b_triagem" placeholder="Liste as perguntas que você faz na ordem."></textarea></div>
+        <div class="field"><label class="field-label">Como prioriza casos quando há fila? <span class="req">*</span></label><textarea data-field="b04b_prioridade" class="tall" placeholder="Ex:&#10;1º — Caso urgente (crise, ideação)&#10;2º — Paciente em tratamento (não pode atrasar retorno)&#10;3º — Indicação direta de paciente ativo&#10;4º — Primeira consulta (ordem de chegada)"></textarea></div>
+        <div class="field"><label class="field-label">Diferencia presencial vs online? Como decide?</label><textarea data-field="b04b_presencial_online" placeholder="O paciente escolhe livremente? Há critério clínico? Restrição de horário?"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Quota máxima de consultas/dia por profissional?</label><input type="text" data-field="b04b_quota_dia" placeholder="Ex: Dr. Bruno até 6 primeiras consultas/dia" /></div>
+          <div class="field"><label class="field-label">Intervalo mínimo entre consultas?</label><input type="text" data-field="b04b_intervalo" placeholder="Ex: 10 min entre consultas" /></div>
+        </div>
+        <div class="field"><label class="field-label">Como confirma a consulta com o paciente?</label><textarea data-field="b04b_confirmacao" placeholder="Quando (na hora? 24h antes?), por qual canal, com qual texto."></textarea></div>
+        <div class="field"><label class="field-label">Como lida com cancelamentos?</label><textarea data-field="b04b_cancelamento" placeholder="Há tolerância de horário? Multa? Lista de espera entra em ação?"></textarea></div>
+        <div class="field"><label class="field-label">Como lida com no-show?</label><textarea data-field="b04b_no_show" placeholder=""></textarea></div>
+        <div class="field"><label class="field-label">Há lista de espera ativa? Como opera?</label><textarea data-field="b04b_lista_espera" placeholder="Quando alguém cancela, como você decide quem chamar?"></textarea></div>
+        <div class="field"><label class="field-label">O que faz quando alguém pede um horário que não tem?</label><textarea data-field="b04b_sem_horario" placeholder="Tenta convencer para outro? Coloca em espera? Encaminha?"></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04b_obs" placeholder="Há regras não escritas? Exceções que sempre acontecem?"></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 07 -->
+    <div class="block" id="bloco-07">
+      <div class="block-marker"><div class="block-num">07</div><div class="block-label">WhatsApp na prática</div></div>
+      <div class="block-body">
+        <h3 class="block-title">As <em>respostas reais</em> que você manda.</h3>
+        <p class="block-intro">O texto literal que você manda no WhatsApp hoje é o <em>material de treinamento</em> do bot. Não precisa polir — pode copiar e colar do próprio WhatsApp se quiser.</p>
+        <div class="field"><label class="field-label">Os 5 tipos de mensagem mais comuns que você recebe <span class="req">*</span></label><textarea data-field="b04c_top5_mensagens" class="tall" placeholder="Ex:&#10;1. Pedido de renovação de receita&#10;2. Solicitação de primeira consulta&#10;3. Dúvida sobre valor / forma de pagamento&#10;4. Confirmação ou reagendamento&#10;5. Pedido de atestado / declaração"></textarea></div>
+        <div class="field"><label class="field-label">Para cada um dos 5 tipos — qual é a sua resposta padrão? <span class="req">*</span></label><span class="field-help">Texto literal. Cole exemplos reais se puder.</span><textarea data-field="b04c_respostas_padrao" class="tall" style="min-height:280px" placeholder="Ex:&#10;1. Renovação:&#10;'Oi, [nome]! Vou pedir pro Dr. Bruno renovar...'&#10;&#10;2. Primeira consulta:&#10;'Olá! Que bom que entrou em contato...'"></textarea></div>
+        <div class="field"><label class="field-label">Você usa atalhos, templates ou respostas salvas?</label><textarea data-field="b04c_templates" placeholder="Liste os atalhos/templates que você já tem."></textarea></div>
+        <div class="field"><label class="field-label">Quando uma mensagem vira "caso para o Dr. Bruno"? <span class="req">*</span></label><textarea data-field="b04c_escalonamento" class="tall" placeholder="Ex:&#10;- Pergunta sobre ajuste de medicação&#10;- Sinal de crise ou desespero&#10;- Mensagem em inglês (atendimento internacional)"></textarea></div>
+        <div class="field" style="background:rgba(200,122,90,0.08);border-left:3px solid #c87a5a;padding:1.4rem;border-radius:0 12px 12px 0;">
+          <label class="field-label" style="color:#c87a5a;">Renovação de receita — operação atual</label>
+          <span class="field-help">Há reclamação pública no Doctoralia sobre demora em receitas. Descreva o fluxo atual com honestidade.</span>
+          <textarea data-field="b04c_receitas" class="tall" style="min-height:200px" placeholder="Ex:&#10;1. Paciente manda mensagem pedindo renovação&#10;2. Confirmo nome e medicamento&#10;3. Encaminho pro Dr. Bruno (grupo interno do WhatsApp)&#10;4. Dr. Bruno autoriza quando tem tempo&#10;5. Emito pelo Memed e mando o link&#10;&#10;Tempo médio: algumas horas até 2 dias úteis."></textarea>
+        </div>
+        <div class="field"><label class="field-label">Protocolo de crise (ideação suicida, surto, emergência)</label><textarea data-field="b04c_crise" class="tall" placeholder="Ex:&#10;- Respondo na hora, mesmo fora do horário&#10;- Mando CVV (188) e emergência psiquiátrica&#10;- Aciono Dr. Bruno por ligação"></textarea></div>
+        <div class="field"><label class="field-label">Como lida com perguntas sobre <em style="color:var(--gold);font-style:normal">valores</em>?</label><textarea data-field="b04c_valores" placeholder="Passa direto? Tenta agendar antes? Há tabela pública?"></textarea></div>
+        <div class="field"><label class="field-label">Como lida com pacientes que querem cancelar tratamento ou faltam reiteradamente?</label><textarea data-field="b04c_evasao" placeholder=""></textarea></div>
+        <div class="field"><label class="field-label">Mensagens fora do horário comercial — como são tratadas hoje?</label><textarea data-field="b04c_fora_horario" placeholder="Há resposta automática? Aviso de horário?"></textarea></div>
+        <div class="field"><label class="field-label">Volume de mensagens que <em style="color:var(--gold);font-style:normal">não conseguem</em> ser respondidas no mesmo dia</label><input type="text" data-field="b04c_atrasadas" placeholder="Ex: ~5 a 10 mensagens/dia ficam para o dia seguinte" /></div>
+        <div class="field"><label class="field-label">Há atendimento em outras línguas (inglês, espanhol, francês)?</label><span class="field-help">O painel cita atendimento internacional (França, EUA, Canadá, Irlanda). Quem responde nessas línguas hoje?</span><textarea data-field="b04c_idiomas" placeholder=""></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04c_obs" placeholder="O que mais te consome no WhatsApp hoje?"></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 08 -->
+    <div class="block" id="bloco-08">
+      <div class="block-marker"><div class="block-num">08</div><div class="block-label">Visão para o bot</div></div>
+      <div class="block-body">
+        <h3 class="block-title">O que o bot <em>deve</em> e o que ele <em>nunca</em> deve fazer.</h3>
+        <p class="block-intro">Sua opinião como quem conhece os pacientes na pele. O Dr. Bruno valida depois. <em>Tudo bem responder o que você acha mesmo que precise revisão.</em></p>
+        <div class="notice" style="margin-bottom:2.5rem">
+          <span class="notice-label">Premissa importante</span>
+          <p class="notice-text">O bot <em style="color:var(--gold);font-style:normal">não vem para te substituir</em> — vem para te liberar das tarefas repetitivas (renovação, agendamento simples, perguntas frequentes) para que você possa focar no que humano faz melhor: cuidar do paciente, gerenciar exceções, construir relacionamento.</p>
+        </div>
+        <div class="field"><label class="field-label">Quais ações o bot deveria resolver <em style="color:var(--gold);font-style:normal">100% sozinho</em>? <span class="req">*</span></label><textarea data-field="b04d_bot_100" class="tall" placeholder="Ex:&#10;- Informar valor e formas de pagamento&#10;- Mandar endereço + link do Google Maps&#10;- Confirmar consulta no dia anterior&#10;- Enviar link da telemedicina"></textarea></div>
+        <div class="field"><label class="field-label">Quais ações o bot <em style="color:#c87a5a;font-style:normal">NUNCA</em> deve resolver sem você ou sem o Dr. Bruno? <span class="req">*</span></label><textarea data-field="b04d_bot_nunca" class="tall" placeholder="Ex:&#10;- Qualquer coisa sobre medicação&#10;- Mensagens com sinal de crise&#10;- Cancelamento de tratamento&#10;- Pedidos de atestado / laudo"></textarea></div>
+        <div class="field"><label class="field-label">Horários em que o bot deve operar <em style="color:var(--gold);font-style:normal">sem você</em>?</label><textarea data-field="b04d_horarios_bot" placeholder="Ex: Fora do horário comercial (18h-8h), finais de semana, feriados."></textarea></div>
+        <div class="field">
+          <label class="field-label">Tom de voz do bot</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b04d_tom" id="b04d_t1" data-field="b04d_tom" value="Formal e respeitoso" /><label for="b04d_t1">Formal</label></span>
+            <span class="option-pill"><input type="radio" name="b04d_tom" id="b04d_t2" data-field="b04d_tom" value="Próximo e acolhedor" /><label for="b04d_t2">Próximo</label></span>
+            <span class="option-pill"><input type="radio" name="b04d_tom" id="b04d_t3" data-field="b04d_tom" value="Neutro e direto" /><label for="b04d_t3">Neutro</label></span>
+            <span class="option-pill"><input type="radio" name="b04d_tom" id="b04d_t4" data-field="b04d_tom" value="Casual e amigável" /><label for="b04d_t4">Casual</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Como o bot se apresentaria na primeira mensagem?</label><textarea data-field="b04d_apresentacao" placeholder="Ex: 'Oi! Sou a assistente virtual da La Vie en Rose. Posso ajudar com agendamentos, dúvidas sobre valores, localização e renovação de receita...'"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Nome sugerido para o bot</label><span class="field-help">Ex: Vie, Rosa, Sofia, ou simplesmente "Assistente".</span><input type="text" data-field="b04d_nome_bot" placeholder="Ex: Vie" /></div>
+          <div class="field"><label class="field-label">Nomes que <em style="color:#c87a5a;font-style:normal">não</em> deveriam ser usados</label><input type="text" data-field="b04d_nome_bot_nao" placeholder="" /></div>
+        </div>
+        <div class="field">
+          <label class="field-label">De 0 a 10 — quanto você se sente confortável com a chegada do bot?</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b04d_conf" id="b04d_c0" data-field="b04d_confortavel" value="0-3" /><label for="b04d_c0">0–3 · receio</label></span>
+            <span class="option-pill"><input type="radio" name="b04d_conf" id="b04d_c1" data-field="b04d_confortavel" value="4-6" /><label for="b04d_c1">4–6 · neutra</label></span>
+            <span class="option-pill"><input type="radio" name="b04d_conf" id="b04d_c2" data-field="b04d_confortavel" value="7-10" /><label for="b04d_c2">7–10 · animada</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Tarefas que você gostaria de <em style="color:var(--gold);font-style:normal">nunca mais</em> fazer</label><textarea data-field="b04d_largar" placeholder="Liste sem culpa. Isso vira prioridade para automação."></textarea></div>
+        <div class="field"><label class="field-label">Tarefas que você <em style="color:var(--cream-bright);font-style:normal">faz questão</em> de manter</label><textarea data-field="b04d_manter" placeholder="O que dá significado ao seu trabalho?"></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04d_obs" placeholder="Receios, expectativas, sugestões."></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 09 -->
+    <div class="block" id="bloco-09">
+      <div class="block-marker"><div class="block-num">09</div><div class="block-label">Plataformas ativas</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Onde a clínica <em>já existe</em> no digital.</h3>
+        <p class="block-intro">Inventário completo dos perfis e plataformas em uso. Para cada um, indique URL, e-mail de cadastro e responsável. <em>Senhas vão no cofre compartilhado — não aqui.</em></p>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Doctoralia — URL do perfil</label><input type="url" data-field="b05_doctoralia_url" placeholder="https://www.doctoralia.com.br/..." /></div>
+          <div class="field"><label class="field-label">Doctoralia — e-mail cadastrado</label><input type="email" data-field="b05_doctoralia_email" placeholder="email@exemplo.com" /></div>
+        </div>
+        <div class="field">
+          <label class="field-label">Google Business Profile</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b05_gbp" id="b05_g1" data-field="b05_gbp" value="Verificado e ativo" /><label for="b05_g1">Verificado</label></span>
+            <span class="option-pill"><input type="radio" name="b05_gbp" id="b05_g2" data-field="b05_gbp" value="Criado mas não verificado" /><label for="b05_g2">Sem verificação</label></span>
+            <span class="option-pill"><input type="radio" name="b05_gbp" id="b05_g3" data-field="b05_gbp" value="Não criado" /><label for="b05_g3">Não criado</label></span>
+            <span class="option-pill"><input type="radio" name="b05_gbp" id="b05_g4" data-field="b05_gbp" value="Não sei" /><label for="b05_g4">Não sei</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Se o GBP existe — e-mail Google que administra</label><input type="email" data-field="b05_gbp_email" placeholder="email@gmail.com" /></div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Instagram da clínica — @</label><input type="text" data-field="b05_ig_clinica" placeholder="@lavieenrose_clinica" /></div>
+          <div class="field"><label class="field-label">E-mail cadastrado neste Instagram</label><input type="email" data-field="b05_ig_clinica_email" placeholder="email@exemplo.com" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Instagram do Dr. Bruno — @</label><input type="text" data-field="b05_ig_bruno" placeholder="@brunobenites.psiquiatra" /></div>
+          <div class="field"><label class="field-label">E-mail cadastrado neste Instagram</label><input type="email" data-field="b05_ig_bruno_email" placeholder="email@exemplo.com" /></div>
+        </div>
+        <div class="field"><label class="field-label">Site atual da clínica</label><input type="url" data-field="b05_site_atual" placeholder="https://..." /></div>
+        <div class="field"><label class="field-label">Outros perfis e plataformas</label><span class="field-help">Facebook, LinkedIn, YouTube, TikTok, outros diretórios médicos. URL + e-mail cadastrado.</span><textarea data-field="b05_outros" class="tall" placeholder="Ex:&#10;Facebook — facebook.com/... — email@exemplo.com&#10;LinkedIn — linkedin.com/in/... — email@exemplo.com"></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b05_obs" placeholder="Há perfis antigos a desativar? Conflito de acessos?"></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 10 -->
+    <div class="block" id="bloco-10">
+      <div class="block-marker"><div class="block-num">10</div><div class="block-label">Domínio &amp; e-mails</div></div>
+      <div class="block-body">
+        <h3 class="block-title">A casa digital <em>própria</em>.</h3>
+        <p class="block-intro">Domínios registrados, onde estão hospedados, e quais e-mails institucionais já existem. Seção decisiva para a Fase 02 do plano.</p>
+        <div class="field"><label class="field-label">Domínio(s) já registrados pela clínica</label><textarea data-field="b06_dominios" placeholder="Ex:&#10;lavieenroseclinica.com.br&#10;lavieenrose.med.br"></textarea></div>
+        <div class="field">
+          <label class="field-label">Onde os domínios estão hospedados (registradora)?</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="checkbox" id="b06_h1" data-field="b06_host_registrobr" value="true" /><label for="b06_h1">Registro.br</label></span>
+            <span class="option-pill"><input type="checkbox" id="b06_h2" data-field="b06_host_godaddy" value="true" /><label for="b06_h2">GoDaddy</label></span>
+            <span class="option-pill"><input type="checkbox" id="b06_h3" data-field="b06_host_hostinger" value="true" /><label for="b06_h3">Hostinger</label></span>
+            <span class="option-pill"><input type="checkbox" id="b06_h4" data-field="b06_host_locaweb" value="true" /><label for="b06_h4">Locaweb</label></span>
+            <span class="option-pill"><input type="checkbox" id="b06_h5" data-field="b06_host_outro" value="true" /><label for="b06_h5">Outra</label></span>
+            <span class="option-pill"><input type="checkbox" id="b06_h6" data-field="b06_host_nao_sei" value="true" /><label for="b06_h6">Não sei</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">E-mail responsável pela conta da registradora</label><input type="email" data-field="b06_registradora_email" placeholder="email@exemplo.com" /></div>
+        <div class="field"><label class="field-label">E-mails institucionais existentes</label><span class="field-help">Liste todos os e-mails @dominioproprio que já funcionam. Indique quem usa cada um.</span><textarea data-field="b06_emails_existentes" class="tall" placeholder="Ex:&#10;contato@lavieenroseclinica.com.br — secretária&#10;dr.bruno@lavieenroseclinica.com.br — Dr. Bruno"></textarea></div>
+        <div class="field">
+          <label class="field-label">Plataforma dos e-mails institucionais</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p1" data-field="b06_plataforma_email" value="Google Workspace" /><label for="b06_p1">Google Workspace</label></span>
+            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p2" data-field="b06_plataforma_email" value="Zoho Mail" /><label for="b06_p2">Zoho Mail</label></span>
+            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p3" data-field="b06_plataforma_email" value="Microsoft 365" /><label for="b06_p3">Microsoft 365</label></span>
+            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p4" data-field="b06_plataforma_email" value="Gmail pessoal" /><label for="b06_p4">Gmail pessoal</label></span>
+            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p5" data-field="b06_plataforma_email" value="Não há e-mail institucional" /><label for="b06_p5">Não há</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b06_obs" placeholder="Há contratos prestes a vencer, e-mails antigos a desativar?"></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 11 -->
+    <div class="block" id="bloco-11">
+      <div class="block-marker"><div class="block-num">11</div><div class="block-label">Sistemas internos</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Os <em>sistemas</em> que rodam por dentro.</h3>
+        <p class="block-intro">Prontuário, agendamento, financeiro, prescrição, pagamentos. Tudo que sustenta a operação clínica e fiscal.</p>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Prontuário eletrônico</label><input type="text" data-field="b07_prontuario" placeholder="Ex: iClinic, Doctoralia, Memed Prontuário, planilha, papel..." /></div>
+          <div class="field"><label class="field-label">Sistema de agendamento</label><input type="text" data-field="b07_agendamento" placeholder="Ex: Doctoralia, iClinic, Google Calendar, agenda física..." /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Sistema de prescrição digital</label><input type="text" data-field="b07_prescricao" placeholder="Ex: Memed, AssinaMed, receitas em papel..." /></div>
+          <div class="field"><label class="field-label">Sistema financeiro / NF-e</label><input type="text" data-field="b07_financeiro" placeholder="Ex: Conta Azul, Nibo, emissor da prefeitura..." /></div>
+        </div>
+        <div class="field">
+          <label class="field-label">Métodos de pagamento aceitos hoje</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="checkbox" id="b07_pg1" data-field="b07_pg_pix" value="true" /><label for="b07_pg1">PIX</label></span>
+            <span class="option-pill"><input type="checkbox" id="b07_pg2" data-field="b07_pg_credito" value="true" /><label for="b07_pg2">Cartão crédito</label></span>
+            <span class="option-pill"><input type="checkbox" id="b07_pg3" data-field="b07_pg_debito" value="true" /><label for="b07_pg3">Cartão débito</label></span>
+            <span class="option-pill"><input type="checkbox" id="b07_pg4" data-field="b07_pg_dinheiro" value="true" /><label for="b07_pg4">Dinheiro</label></span>
+            <span class="option-pill"><input type="checkbox" id="b07_pg5" data-field="b07_pg_boleto" value="true" /><label for="b07_pg5">Boleto</label></span>
+            <span class="option-pill"><input type="checkbox" id="b07_pg6" data-field="b07_pg_link" value="true" /><label for="b07_pg6">Link de pagamento</label></span>
+            <span class="option-pill"><input type="checkbox" id="b07_pg7" data-field="b07_pg_convenio" value="true" /><label for="b07_pg7">Convênio</label></span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Maquininha / gateway principal</label><input type="text" data-field="b07_gateway" placeholder="Ex: Stone, PagSeguro, Mercado Pago, Cielo..." /></div>
+          <div class="field">
+            <label class="field-label">Atende convênio?</label>
+            <div class="options-row">
+              <span class="option-pill"><input type="radio" name="b07_conv" id="b07_c1" data-field="b07_convenio" value="Não, só particular" /><label for="b07_c1">Só particular</label></span>
+              <span class="option-pill"><input type="radio" name="b07_conv" id="b07_c2" data-field="b07_convenio" value="Sim, alguns" /><label for="b07_c2">Alguns</label></span>
+              <span class="option-pill"><input type="radio" name="b07_conv" id="b07_c3" data-field="b07_convenio" value="Particular com NF para reembolso" /><label for="b07_c3">NF p/ reembolso</label></span>
+            </div>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Se atende convênio — quais?</label><input type="text" data-field="b07_convenios_lista" placeholder="Ex: Bradesco Saúde, SulAmérica, Unimed..." /></div>
+        <div class="field"><label class="field-label">Há CRM de pacientes?</label><input type="text" data-field="b07_crm" placeholder="Ex: RD Station, HubSpot, planilha, não há..." /></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b07_obs" placeholder="Sistemas que não funcionam bem, integrações desejadas..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 12 -->
+    <div class="block" id="bloco-12">
+      <div class="block-marker"><div class="block-num">12</div><div class="block-label">Materiais existentes</div></div>
+      <div class="block-body">
+        <h3 class="block-title">O que <em>já existe</em> de identidade visual.</h3>
+        <p class="block-intro">Logos, fotos, vídeos, materiais impressos. Vamos avaliar o que aproveitar e o que recriar. Indique apenas se existe e o nome do arquivo na pasta "Arquivos" do Drive.</p>
+        <div class="field">
+          <label class="field-label">Logo atual da clínica</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b08_logo" id="b08_l1" data-field="b08_logo_existe" value="Existe em alta resolução" /><label for="b08_l1">Em alta resolução</label></span>
+            <span class="option-pill"><input type="radio" name="b08_logo" id="b08_l2" data-field="b08_logo_existe" value="Existe só em baixa" /><label for="b08_l2">Só em baixa</label></span>
+            <span class="option-pill"><input type="radio" name="b08_logo" id="b08_l3" data-field="b08_logo_existe" value="Não existe" /><label for="b08_l3">Não existe</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Se existe — nome do(s) arquivo(s) na pasta "Arquivos"</label><input type="text" data-field="b08_logo_arquivo" placeholder="Ex: logo_atual_alta.png, logo_atual.ai" /></div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Há manual de marca atual?</label>
+            <div class="options-row">
+              <span class="option-pill"><input type="radio" name="b08_manual" id="b08_mn1" data-field="b08_manual" value="Sim" /><label for="b08_mn1">Sim</label></span>
+              <span class="option-pill"><input type="radio" name="b08_manual" id="b08_mn2" data-field="b08_manual" value="Não" /><label for="b08_mn2">Não</label></span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Há paleta de cores oficial?</label>
+            <div class="options-row">
+              <span class="option-pill"><input type="radio" name="b08_paleta" id="b08_pa1" data-field="b08_paleta" value="Sim" /><label for="b08_pa1">Sim</label></span>
+              <span class="option-pill"><input type="radio" name="b08_paleta" id="b08_pa2" data-field="b08_paleta" value="Sim, mas não documentada" /><label for="b08_pa2">Informal</label></span>
+              <span class="option-pill"><input type="radio" name="b08_paleta" id="b08_pa3" data-field="b08_paleta" value="Não" /><label for="b08_pa3">Não</label></span>
+            </div>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Fotos profissionais existentes</label><textarea data-field="b08_fotos" placeholder="Ex:&#10;~30 fotos do Dr. Bruno tiradas em 2023 (em /Arquivos/fotos_bruno_2023)&#10;~15 fotos da clínica"></textarea></div>
+        <div class="field"><label class="field-label">Vídeos institucionais existentes</label><textarea data-field="b08_videos" placeholder="Ex: vídeo de apresentação gravado em 2024, 2 min, em alta resolução"></textarea></div>
+        <div class="field"><label class="field-label">Materiais impressos</label><textarea data-field="b08_impressos" placeholder="Ex: cartão de visita atual, papel de prescrição em papelaria"></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b08_obs" placeholder="Material antigo a descontinuar? Identidade da época da fundação a resgatar?"></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 13 -->
+    <div class="block" id="bloco-13">
+      <div class="block-marker"><div class="block-num">13</div><div class="block-label">Parceiros &amp; fornecedores</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Quem <em>orbita</em> a clínica.</h3>
+        <p class="block-intro">Contador, advogado, designer atual, fotógrafo, agência de marketing anterior. Saber quem já está envolvido evita atritos e duplicidades.</p>
+        <div class="field"><label class="field-label">Advogado(a) — especialmente para LGPD e CFM</label><textarea data-field="b09_advogado" placeholder="Nome — área de atuação — contato"></textarea></div>
+        <div class="field"><label class="field-label">Designer ou agência atual</label><textarea data-field="b09_designer" placeholder="Nome — escopo do trabalho — contato — status (ativo/pausado/encerrado)"></textarea></div>
+        <div class="field"><label class="field-label">Fotógrafo(a) de confiança</label><textarea data-field="b09_fotografo" placeholder="Nome — estilo — contato"></textarea></div>
+        <div class="field"><label class="field-label">Editor(a) de vídeo / videomaker</label><textarea data-field="b09_videomaker" placeholder="Nome — escopo — contato"></textarea></div>
+        <div class="field"><label class="field-label">Outros fornecedores ativos</label><textarea data-field="b09_outros_fornecedores" class="tall" placeholder="Liste um por linha."></textarea></div>
+        <div class="field"><label class="field-label">Há contrato vigente com outra agência ou freelancer?</label><textarea data-field="b09_contrato_vigente" placeholder="Sim/não, com quem, qual escopo, quando vence."></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b09_obs" placeholder=""></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 14 -->
+    <div class="block" id="bloco-14">
+      <div class="block-marker"><div class="block-num">14</div><div class="block-label">Histórico &amp; campanhas</div></div>
+      <div class="block-body">
+        <h3 class="block-title">A <em>memória</em> de marketing.</h3>
+        <p class="block-intro">Tudo que já foi tentado, com resultado bom ou ruim. Uma das seções mais valiosas — evita repetir erros e potencializa o que já deu certo.</p>
+        <div class="field"><label class="field-label">Há quanto tempo a clínica existe?</label><input type="text" data-field="b10_idade_clinica" placeholder="Ex: 4 anos (fundada em 2022)" /></div>
+        <div class="field"><label class="field-label">Trabalhos de marketing já realizados</label><textarea data-field="b10_trabalhos_anteriores" class="tall" placeholder="Ex:&#10;2023 — Google Ads (3 meses, R$ 2k/mês) — gerou ~8 consultas&#10;2024 — social media com agência X (6 meses) — não funcionou"></textarea></div>
+        <div class="field"><label class="field-label">Há campanha ativa agora?</label><textarea data-field="b10_campanha_ativa" placeholder="Se sim: plataforma, investimento mensal, quem gerencia."></textarea></div>
+        <div class="field"><label class="field-label">Datas importantes do ano para a clínica</label><span class="field-help">Aniversário da clínica, aniversário do Dr. Bruno, sazonalidades de atendimento.</span><textarea data-field="b10_datas" class="tall" placeholder="Ex:&#10;Janeiro — alta procura pós-festas&#10;Aniversário da clínica: 15 de março&#10;Setembro Amarelo: pico de demanda institucional&#10;Dezembro — queda forte de agendamentos"></textarea></div>
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b10_obs" placeholder=""></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 15 -->
+    <div class="block" id="bloco-15">
+      <div class="block-marker"><div class="block-num">15</div><div class="block-label">Indicadores operacionais</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Os <em>números reais</em> da operação.</h3>
+        <p class="block-intro">Estimativas honestas — não precisa ser exato, mas precisa ser real. Esses números viram a linha de base para medir o impacto do ecossistema.</p>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Consultas/mês (estimativa)</label><input type="text" data-field="b11_consultas_mes" placeholder="Ex: 80 a 100" /></div>
+          <div class="field"><label class="field-label">% de pacientes recorrentes</label><input type="text" data-field="b11_recorrentes" placeholder="Ex: 60%" /></div>
+        </div>
+        <div class="field">
+          <label class="field-label">Origem dos pacientes hoje — distribuição estimada</label>
+          <div class="field-row three">
+            <div class="field" style="margin-bottom:0.8rem"><label class="field-label">Doctoralia</label><input type="text" data-field="b11_origem_doctoralia" placeholder="%" /></div>
+            <div class="field" style="margin-bottom:0.8rem"><label class="field-label">Indicação</label><input type="text" data-field="b11_origem_indicacao" placeholder="%" /></div>
+            <div class="field" style="margin-bottom:0.8rem"><label class="field-label">Google</label><input type="text" data-field="b11_origem_google" placeholder="%" /></div>
+          </div>
+          <div class="field-row three" style="margin-top:0.6rem">
+            <div class="field" style="margin-bottom:0.8rem"><label class="field-label">Instagram</label><input type="text" data-field="b11_origem_instagram" placeholder="%" /></div>
+            <div class="field" style="margin-bottom:0.8rem"><label class="field-label">Convênio</label><input type="text" data-field="b11_origem_convenio" placeholder="%" /></div>
+            <div class="field" style="margin-bottom:0.8rem"><label class="field-label">Outros</label><input type="text" data-field="b11_origem_outros" placeholder="%" /></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Taxa de no-show estimada</label><input type="text" data-field="b11_no_show" placeholder="Ex: 8%" /></div>
+          <div class="field"><label class="field-label">Ticket médio por consulta</label><input type="text" data-field="b11_ticket" placeholder="Ex: R$ 850" /></div>
+        </div>
+        <div class="field">
+          <label class="field-label">Existe lista de espera?</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b11_espera" id="b11_e1" data-field="b11_lista_espera" value="Sim, longa (mais de 2 semanas)" /><label for="b11_e1">Sim · 2+ semanas</label></span>
+            <span class="option-pill"><input type="radio" name="b11_espera" id="b11_e2" data-field="b11_lista_espera" value="Sim, curta (até 1 semana)" /><label for="b11_e2">Sim · até 1 sem</label></span>
+            <span class="option-pill"><input type="radio" name="b11_espera" id="b11_e3" data-field="b11_lista_espera" value="Não, agenda disponível" /><label for="b11_e3">Não · agenda livre</label></span>
+            <span class="option-pill"><input type="radio" name="b11_espera" id="b11_e4" data-field="b11_lista_espera" value="Varia muito" /><label for="b11_e4">Varia muito</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Observações finais — qualquer coisa que importe e não foi perguntada</label><textarea data-field="b11_obs_geral" class="tall" placeholder="Use este espaço para o que ficou de fora dos blocos anteriores."></textarea></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing">
+    <div class="closing-eyebrow">— Próximos passos —</div>
+    <h2 class="closing-title">Pronto. Agora <em>fica fácil</em>.</h2>
+    <p class="closing-sub">Quando terminar, exporte suas respostas e envie para o Felipe e a Chiara. <em>Eles vão te enviar separadamente o convite do cofre de senhas.</em></p>
+    <div class="closing-actions">
+      <button class="closing-btn" onclick="exportAnswers()">Exportar respostas (JSON)</button>
+      <button class="closing-btn" onclick="window.print()">Imprimir / salvar PDF</button>
+    </div>
+  </section>
+
+</main>
+<script>
+  const SUPABASE_URL = "https://odijbzgdewzkbuvrusoj.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kaWpiemdkZXd6a2J1dnJ1c29qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MDUwODYsImV4cCI6MjA5MzM4MTA4Nn0.-U_zO_QBmzOa8Av0wDvbu5Vy1AkxSweooxV6yT1-Ht8";
+  const APP_USER_EMAIL = "lavieenrose@lvr.local";
+  const STORAGE_KEY = "lvr_briefing_01_v1";
+  const STORAGE_PEOPLE = "lvr_briefing_01_people_v1";
+  let sb;
+
+  // ===== PERSON CARD =====
+  function personCardHTML(idx) {
+    return `<div class="person-card" data-person="${idx}">
+      <div class="person-card-header">
+        <span class="person-card-num">Pessoa #${idx}</span>
+        <button class="person-card-remove" type="button" onclick="removePerson(${idx})">Remover</button>
+      </div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">Nome completo</label><input type="text" data-field="p${idx}_nome" placeholder="Nome completo" /></div>
+        <div class="field"><label class="field-label">Cargo / função</label><input type="text" data-field="p${idx}_cargo" placeholder="Ex: Psiquiatra · sócio fundador" /></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label class="field-label">CRM / CRP</label><input type="text" data-field="p${idx}_crm" placeholder="Ex: CRM-SP 000000" /></div>
+        <div class="field"><label class="field-label">RQE (se houver)</label><input type="text" data-field="p${idx}_rqe" placeholder="Ex: RQE 00000" /></div>
+        <div class="field"><label class="field-label">Especialidade</label><input type="text" data-field="p${idx}_esp" placeholder="Ex: Psiquiatria" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">E-mail profissional</label><input type="email" data-field="p${idx}_email" placeholder="email@exemplo.com" /></div>
+        <div class="field"><label class="field-label">Telefone / WhatsApp direto</label><input type="tel" data-field="p${idx}_tel" placeholder="(00) 00000-0000" /></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label class="field-label">Instagram (@)</label><input type="text" data-field="p${idx}_ig" placeholder="@usuario" /></div>
+        <div class="field"><label class="field-label">LinkedIn (URL)</label><input type="url" data-field="p${idx}_linkedin" placeholder="https://..." /></div>
+        <div class="field"><label class="field-label">Lattes (URL)</label><input type="url" data-field="p${idx}_lattes" placeholder="https://..." /></div>
+      </div>
+      <div class="field"><label class="field-label">Formação resumida (linha biográfica)</label><span class="field-help">Frase de 1-2 linhas pronta para usar em redes e site.</span><textarea data-field="p${idx}_bio" placeholder="Ex: Psiquiatra formado pela USP com residência no HC-FMRP-USP. Especialista em psiquiatria intervencionista."></textarea></div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">Modalidades de atendimento</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="checkbox" id="p${idx}_mp" data-field="p${idx}_mod_pres" value="true" /><label for="p${idx}_mp">Presencial</label></span>
+            <span class="option-pill"><input type="checkbox" id="p${idx}_mo" data-field="p${idx}_mod_online" value="true" /><label for="p${idx}_mo">Online</label></span>
+            <span class="option-pill"><input type="checkbox" id="p${idx}_md" data-field="p${idx}_mod_dom" value="true" /><label for="p${idx}_md">Domiciliar</label></span>
+          </div>
+        </div>
+        <div class="field"><label class="field-label">Foto profissional disponível?</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="p${idx}_foto" id="p${idx}_f1" data-field="p${idx}_foto" value="Sim, em alta" /><label for="p${idx}_f1">Em alta</label></span>
+            <span class="option-pill"><input type="radio" name="p${idx}_foto" id="p${idx}_f2" data-field="p${idx}_foto" value="Sim, em baixa" /><label for="p${idx}_f2">Em baixa</label></span>
+            <span class="option-pill"><input type="radio" name="p${idx}_foto" id="p${idx}_f3" data-field="p${idx}_foto" value="Não tem" /><label for="p${idx}_f3">Não tem</label></span>
+          </div>
+        </div>
+      </div>
+      <div class="field"><label class="field-label">Autorização de uso de imagem assinada?</label>
+        <div class="options-row">
+          <span class="option-pill"><input type="radio" name="p${idx}_aut" id="p${idx}_a1" data-field="p${idx}_autoriza" value="Sim" /><label for="p${idx}_a1">Sim</label></span>
+          <span class="option-pill"><input type="radio" name="p${idx}_aut" id="p${idx}_a2" data-field="p${idx}_autoriza" value="Não, mas vai assinar" /><label for="p${idx}_a2">Vai assinar</label></span>
+          <span class="option-pill"><input type="radio" name="p${idx}_aut" id="p${idx}_a3" data-field="p${idx}_autoriza" value="Não, e prefere não aparecer" /><label for="p${idx}_a3">Não aparece</label></span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  let personCount = 0;
+  function addPerson() {
+    personCount++;
+    const container = document.getElementById("people-container");
+    container.insertAdjacentHTML("beforeend", personCardHTML(personCount));
+    container.querySelectorAll(`[data-person="${personCount}"] [data-field]`).forEach(attachListener);
+    savePeopleCount(); updateProgress();
+  }
+  function removePerson(idx) {
+    if (!confirm(`Remover Pessoa #${idx}? Os dados serão apagados.`)) return;
+    const card = document.querySelector(`[data-person="${idx}"]`);
+    if (card) card.remove();
+    const s = loadState();
+    Object.keys(s).forEach(k => { if (k.startsWith(`p${idx}_`)) delete s[k]; });
+    saveState(s); savePeopleCount(); updateProgress();
+    showSync("Pessoa removida", "saved");
+  }
+  function savePeopleCount() {
+    const ids = Array.from(document.querySelectorAll("[data-person]")).map(el => parseInt(el.dataset.person));
+    localStorage.setItem(STORAGE_PEOPLE, JSON.stringify(ids));
+  }
+
+  // ===== STATE =====
+  function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; } }
+  function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+  function setFieldValue(el, v) {
+    if (el.type === "checkbox") el.checked = v === true || v === "true";
+    else if (el.type === "radio") el.checked = el.value === v;
+    else el.value = v || "";
+  }
+  function getFieldValue(el) {
+    if (el.type === "checkbox") return el.checked;
+    if (el.type === "radio") return el.checked ? el.value : null;
+    return el.value;
+  }
+  function attachListener(el) {
+    const h = () => {
+      const s = loadState();
+      const v = getFieldValue(el);
+      if (el.type === "radio") { if (el.checked) s[el.dataset.field] = v; }
+      else s[el.dataset.field] = v;
+      saveState(s); updateProgress();
+      showSync("Guardado", "saved");
+    };
+    el.addEventListener("input", h);
+    el.addEventListener("change", h);
+  }
+  function restoreState() {
+    const s = loadState();
+    document.querySelectorAll("[data-field]").forEach(el => {
+      const v = s[el.dataset.field];
+      if (v !== undefined) setFieldValue(el, v);
+    });
+  }
+
+  // ===== PROGRESS =====
+  function updateProgress() {
+    const allFields = document.querySelectorAll("[data-field]");
+    let filled = 0; let total = 0;
+    const seenR = new Set(); const countedR = new Set();
+    allFields.forEach(el => {
+      if (el.type === "radio") {
+        if (!seenR.has(el.name)) { seenR.add(el.name); if (document.querySelector(`input[name="${el.name}"]:checked`)) filled++; }
+        if (!countedR.has(el.name)) { countedR.add(el.name); total++; }
+      } else if (el.type === "checkbox") { if (el.checked) filled++; total++; }
+      else { if (el.value.trim().length > 0) filled++; total++; }
+    });
+    const pct = total > 0 ? Math.round((filled / total) * 100) : 0;
+    const fillEl = document.getElementById("progressFill");
+    const pctEl = document.getElementById("progressPct");
+    if (fillEl) fillEl.style.width = pct + "%";
+    if (pctEl) pctEl.textContent = pct + "%";
+  }
+
+  // ===== EXPORT / IMPORT / RESET =====
+  function exportAnswers() {
+    const payload = { project: "La Vie en Rose · Briefing", version: "1.0", exportedAt: new Date().toISOString(), answers: loadState() };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement("a"), { href: url, download: `lvr-briefing-01-${new Date().toISOString().slice(0,10)}.json` });
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showSync("Respostas exportadas", "saved");
+  }
+  function importAnswers() { document.getElementById("importInput").click(); }
+  document.getElementById("importInput").addEventListener("change", e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        if (!parsed.answers) throw new Error("Formato inválido");
+        if (confirm("Isso vai substituir todas as respostas atuais. Continuar?")) {
+          saveState(parsed.answers);
+          document.getElementById("people-container").innerHTML = ""; personCount = 0;
+          const pIdxs = new Set();
+          Object.keys(parsed.answers).forEach(k => { const m = k.match(/^p(\d+)_/); if (m) pIdxs.add(parseInt(m[1])); });
+          Array.from(pIdxs).sort((a,b)=>a-b).forEach(()=>addPerson());
+          restoreState(); updateProgress();
+          showSync("Respostas importadas", "saved");
+        }
+      } catch { showSync("Arquivo inválido", "error"); }
+    };
+    reader.readAsText(file); e.target.value = "";
+  });
+  function resetAnswers() {
+    if (!confirm("Apagar todas as respostas? Não dá pra desfazer.")) return;
+    localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_PEOPLE);
+    document.querySelectorAll("[data-field]").forEach(el => setFieldValue(el, ""));
+    document.getElementById("people-container").innerHTML = ""; personCount = 0;
+    addPerson(); updateProgress(); showSync("Tudo limpo", "saved");
+  }
+
+  // ===== SYNC INDICATOR =====
+  const syncEl = document.getElementById("syncIndicator");
+  const syncTextEl = document.getElementById("syncText");
+  let syncTimer;
+  function showSync(msg, state) {
+    if (!syncEl) return;
+    syncEl.className = "sync-indicator visible " + (state || "");
+    syncTextEl.textContent = msg;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => { syncEl.className = "sync-indicator"; }, 2200);
+  }
+
+  // ===== SCROLL SPY =====
+  function setupScrollSpy() {
+    const blocks = document.querySelectorAll(".block[id]");
+    const links = document.querySelectorAll(".sidebar-link[href^='#']");
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.id;
+          links.forEach(l => l.classList.toggle("active", l.getAttribute("href") === "#" + id));
+        }
+      });
+    }, { rootMargin: "-25% 0px -65% 0px" });
+    blocks.forEach(b => io.observe(b));
+  }
+
+  // ===== SIDEBAR TOGGLE =====
+  document.getElementById("sidebarToggle").addEventListener("click", () => {
+    document.body.classList.toggle("sidebar-open");
+  });
+
+  // ===== LOGIN =====
+  const loginGate = document.getElementById("loginGate");
+  const loginInput = document.getElementById("loginInput");
+  const loginBtn = document.getElementById("loginBtn");
+  const loginError = document.getElementById("loginError");
+
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, storageKey: "lvr_briefing_auth_v1" }
+  });
+
+  async function attemptLogin() {
+    const password = loginInput.value;
+    if (!password) { loginError.textContent = "Digite a senha."; loginInput.focus(); return; }
+    loginBtn.disabled = true; loginError.textContent = "Verificando...";
+    try {
+      const { error } = await sb.auth.signInWithPassword({ email: APP_USER_EMAIL, password });
+      if (error) { loginError.textContent = "Senha incorreta."; loginInput.value = ""; loginInput.focus(); loginBtn.disabled = false; return; }
+      await unlock();
+    } catch { loginError.textContent = "Erro de conexão. Tente novamente."; loginBtn.disabled = false; }
+  }
+
+  async function unlock() {
+    loginBtn.disabled = true; loginError.textContent = "";
+    document.body.classList.remove("locked");
+    loginGate.classList.add("hidden");
+    boot();
+  }
+
+  loginBtn.addEventListener("click", attemptLogin);
+  loginInput.addEventListener("keydown", e => { if (e.key === "Enter") attemptLogin(); });
+
+  // ===== BOOT =====
+  function boot() {
+    document.querySelectorAll("[data-field]").forEach(attachListener);
+    const saved = JSON.parse(localStorage.getItem(STORAGE_PEOPLE) || "[]");
+    if (saved.length > 0) {
+      personCount = Math.max(...saved);
+      const container = document.getElementById("people-container");
+      saved.sort((a,b)=>a-b).forEach(idx => {
+        container.insertAdjacentHTML("beforeend", personCardHTML(idx));
+        container.querySelectorAll(`[data-person="${idx}"] [data-field]`).forEach(attachListener);
+      });
+    } else { addPerson(); }
+    restoreState(); updateProgress(); setupScrollSpy();
+    showSync("Sincronizado", "saved");
+  }
+
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) await unlock();
+  })();
+</script>
+</body>
+</html>
