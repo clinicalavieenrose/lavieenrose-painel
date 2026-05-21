@@ -59,16 +59,6 @@
     z-index: 0;
   }
 
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.78 0 0 0 0 0.59 0 0 0 0 0.35 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.4;
-    pointer-events: none;
-    z-index: 1;
-    mix-blend-mode: overlay;
-  }
 
   main { position: relative; z-index: 2; }
 
@@ -1333,7 +1323,7 @@
     border-radius: 3px;
     color: var(--cream-bright);
     font-family: var(--font-body);
-    font-size: 0.95rem;
+    font-size: 1rem; /* mínimo 16px para evitar zoom automático no iOS */
     margin-bottom: 1rem;
     outline: none;
     transition: border-color 0.2s;
@@ -2015,45 +2005,35 @@
      BACKGROUND: imagem Tahoe Dusk + blobs orgânicos como névoa
      ============================================================ */
 
-  /* Imagem de fundo no body */
   body {
-    background:
-      url("./tahoe-dusk.webp") center / cover no-repeat fixed,
-      var(--bg) !important;
+    background: var(--bg) !important;
   }
 
-  /* Camada 1 (body::before): blobs orgânicos #19262D animados como névoa.
-     Usa múltiplos radial-gradients posicionados via custom properties
-     que mudam com keyframes — efeito de névoa flutuando.
-     IMPORTANTE: position/inset/content são re-declarados aqui pra garantir
-     que os blobs fiquem fixed acima da imagem de fundo do body. */
+  /* z-index stack: imagem (-1) → névoa (0) → main (3) */
+  body::after {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: -1 !important;
+    background: url("./tahoe-dusk.webp") center / cover no-repeat !important;
+    pointer-events: none !important;
+  }
+
+  /* Névoa + luz dourada sobre a imagem */
   body::before {
     content: "" !important;
     position: fixed !important;
     inset: 0 !important;
     pointer-events: none !important;
     background:
+      radial-gradient(ellipse 600px 400px at 80% 20%, rgba(200, 151, 90, 0.05), transparent 60%),
+      radial-gradient(ellipse 500px 300px at 15% 80%, rgba(70, 98, 112, 0.08), transparent 60%),
       radial-gradient(ellipse 55% 40% at var(--blob1-x, 18%) var(--blob1-y, 28%), rgba(25, 38, 45, 0.55), rgba(25, 38, 45, 0.25) 45%, transparent 75%),
       radial-gradient(ellipse 50% 50% at var(--blob2-x, 78%) var(--blob2-y, 62%), rgba(25, 38, 45, 0.5), rgba(25, 38, 45, 0.22) 45%, transparent 75%),
       radial-gradient(ellipse 65% 35% at var(--blob3-x, 48%) var(--blob3-y, 88%), rgba(25, 38, 45, 0.45), rgba(25, 38, 45, 0.18) 50%, transparent 78%),
-      radial-gradient(ellipse 45% 55% at var(--blob4-x, 92%) var(--blob4-y, 12%), rgba(25, 38, 45, 0.42), rgba(25, 38, 45, 0.16) 50%, transparent 78%),
-      linear-gradient(180deg, rgba(25, 38, 45, 0.25), rgba(25, 38, 45, 0.4)) !important;
+      radial-gradient(ellipse 45% 55% at var(--blob4-x, 92%) var(--blob4-y, 12%), rgba(25, 38, 45, 0.42), rgba(25, 38, 45, 0.16) 50%, transparent 78%) !important;
     animation: fog-drift 45s ease-in-out infinite alternate !important;
-    z-index: 1 !important;
-  }
-
-  /* Camada 2 (body::after): toques residuais de luz dourada/azul */
-  body::after {
-    content: "" !important;
-    position: fixed !important;
-    inset: 0 !important;
-    pointer-events: none !important;
-    background:
-      radial-gradient(ellipse 600px 400px at 80% 20%, rgba(200, 151, 90, 0.05), transparent 60%),
-      radial-gradient(ellipse 500px 300px at 15% 80%, rgba(70, 98, 112, 0.08), transparent 60%) !important;
-    opacity: 1 !important;
-    mix-blend-mode: normal !important;
-    z-index: 2 !important;
+    z-index: 0 !important;
   }
 
   /* Animação dos blobs: cada um se desloca por trajetórias diferentes */
@@ -3172,24 +3152,21 @@
      que tenha tentado sobrescrever blobs ou scrollbar perde aqui.
      ============================================================ */
 
-  /* Blobs orgânicos como névoa — camada acima da imagem do body.
-     Tons mais escuros e opacos que a versão original pra criar
-     contraste real com a imagem do Tahoe e melhorar legibilidade do texto.
-     A imagem original era cinza-azulada e os blobs originais também — eles
-     existiam mas se camuflavam visualmente. */
+  /* Camada de névoa sobre a imagem */
   html body::before {
     content: "" !important;
     position: fixed !important;
     inset: 0 !important;
     pointer-events: none !important;
     background:
+      radial-gradient(ellipse 600px 400px at 80% 20%, rgba(200, 151, 90, 0.05), transparent 60%),
+      radial-gradient(ellipse 500px 300px at 15% 80%, rgba(70, 98, 112, 0.08), transparent 60%),
       radial-gradient(ellipse 55% 40% at var(--blob1-x, 18%) var(--blob1-y, 28%), rgba(10, 18, 22, 0.7), rgba(10, 18, 22, 0.35) 45%, transparent 75%),
       radial-gradient(ellipse 50% 50% at var(--blob2-x, 78%) var(--blob2-y, 62%), rgba(10, 18, 22, 0.65), rgba(10, 18, 22, 0.3) 45%, transparent 75%),
       radial-gradient(ellipse 65% 35% at var(--blob3-x, 48%) var(--blob3-y, 88%), rgba(10, 18, 22, 0.6), rgba(10, 18, 22, 0.28) 50%, transparent 78%),
-      radial-gradient(ellipse 45% 55% at var(--blob4-x, 92%) var(--blob4-y, 12%), rgba(10, 18, 22, 0.55), rgba(10, 18, 22, 0.25) 50%, transparent 78%),
-      linear-gradient(180deg, rgba(10, 18, 22, 0.3), rgba(10, 18, 22, 0.45)) !important;
+      radial-gradient(ellipse 45% 55% at var(--blob4-x, 92%) var(--blob4-y, 12%), rgba(10, 18, 22, 0.55), rgba(10, 18, 22, 0.25) 50%, transparent 78%) !important;
     animation: fog-drift 45s ease-in-out infinite alternate !important;
-    z-index: 1 !important;
+    z-index: 0 !important;
     opacity: 1 !important;
     mix-blend-mode: normal !important;
     filter: none !important;
@@ -3197,18 +3174,15 @@
     -webkit-backdrop-filter: none !important;
   }
 
-  /* Camada de luz residual */
+  /* Imagem de fundo — z-index negativo fica abaixo de tudo */
   html body::after {
     content: "" !important;
     position: fixed !important;
     inset: 0 !important;
     pointer-events: none !important;
-    background:
-      radial-gradient(ellipse 600px 400px at 80% 20%, rgba(200, 151, 90, 0.05), transparent 60%),
-      radial-gradient(ellipse 500px 300px at 15% 80%, rgba(70, 98, 112, 0.08), transparent 60%) !important;
+    background: url("./tahoe-dusk.webp") center / cover no-repeat !important;
+    z-index: -1 !important;
     opacity: 1 !important;
-    mix-blend-mode: normal !important;
-    z-index: 2 !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
