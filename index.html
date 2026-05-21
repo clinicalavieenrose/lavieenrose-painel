@@ -3193,13 +3193,18 @@
     z-index: 3 !important;
   }
 
-  /* Scrollbar da sidebar movida para o lado esquerdo via direction trick.
-     IMPORTANTE: o scroll real acontece em .sidebar-inner (wrapper interno),
-     não em .sidebar — a sidebar tem overflow:hidden pra cortar nos cantos
-     arredondados. Por isso o rtl precisa estar no inner. */
+  /* Scrollbar sempre à esquerda — técnica mirror via transform.
+     scaleX(-1) no inner espelha horizontalmente, jogando a scrollbar
+     nativa para a esquerda. scaleX(-1) nos filhos desfaz o espelho
+     no conteúdo. Funciona em iOS Safari, Chrome Android e desktop. */
   html body .sidebar { direction: ltr !important; }
-  html body .sidebar-inner { direction: rtl !important; }
-  html body .sidebar-inner > * { direction: ltr !important; }
+  html body .sidebar-inner {
+    direction: ltr !important;
+    transform: scaleX(-1) !important;
+  }
+  html body .sidebar-inner > * {
+    transform: scaleX(-1) !important;
+  }
 
 </style>
 </head>
