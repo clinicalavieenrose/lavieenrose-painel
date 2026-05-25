@@ -4267,11 +4267,55 @@
   function savePeopleCount() {
     const ids = Array.from(document.querySelectorAll("[data-person]")).map(el => parseInt(el.dataset.person));
     localStorage.setItem(STORAGE_PEOPLE, JSON.stringify(ids));
+    scheduleSyncToSupabase();
   }
 
   // ===== STATE =====
   function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; } }
-  function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+  function saveState(s) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    scheduleSyncToSupabase();
+  }
+
+  // ===== SUPABASE SYNC =====
+  const BRIEFING_ID = "lvr_briefing_01";
+  let _syncTimer;
+
+  function scheduleSyncToSupabase() {
+    clearTimeout(_syncTimer);
+    _syncTimer = setTimeout(pushToSupabase, 900);
+  }
+
+  async function pushToSupabase() {
+    if (!sb) return;
+    try {
+      const { error } = await sb.from("briefing_data").upsert({
+        briefing_id: BRIEFING_ID,
+        answers: loadState(),
+        people_ids: JSON.parse(localStorage.getItem(STORAGE_PEOPLE) || "[]"),
+        updated_at: new Date().toISOString()
+      }, { onConflict: "briefing_id" });
+      if (error) { console.error("Supabase push error:", error); showSync("Erro ao salvar", "error"); }
+    } catch (e) {
+      console.error("Supabase push failed:", e);
+    }
+  }
+
+  async function pullFromSupabase() {
+    if (!sb) return null;
+    try {
+      const { data, error } = await sb
+        .from("briefing_data")
+        .select("answers, people_ids, updated_at")
+        .eq("briefing_id", BRIEFING_ID)
+        .single();
+      if (error || !data) return null;
+      return data;
+    } catch (e) {
+      console.error("Supabase pull failed:", e);
+      return null;
+    }
+  }
   function setFieldValue(el, v) {
     if (el.type === "checkbox") el.checked = v === true || v === "true";
     else if (el.type === "radio") el.checked = el.value === v;
@@ -4416,14 +4460,21 @@
     loginBtn.disabled = true; loginError.textContent = "";
     document.body.classList.remove("locked");
     loginGate.classList.add("hidden");
-    boot();
+    await boot();
   }
 
   loginBtn.addEventListener("click", attemptLogin);
   loginInput.addEventListener("keydown", e => { if (e.key === "Enter") attemptLogin(); });
 
   // ===== BOOT =====
-  function boot() {
+  async function boot() {
+    showSync("Carregando...", "");
+    // Supabase é a fonte de verdade — sobrescreve o localStorage
+    const remote = await pullFromSupabase();
+    if (remote) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(remote.answers || {}));
+      localStorage.setItem(STORAGE_PEOPLE, JSON.stringify(remote.people_ids || []));
+    }
     document.querySelectorAll("[data-field]").forEach(attachListener);
     const saved = JSON.parse(localStorage.getItem(STORAGE_PEOPLE) || "[]");
     if (saved.length > 0) {
