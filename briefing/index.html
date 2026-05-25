@@ -3653,6 +3653,7 @@
       <a class="sidebar-link" href="#bloco-13"><span class="sidebar-link-num">13</span>Parceiros &amp; fornecedores</a>
       <a class="sidebar-link" href="#bloco-14"><span class="sidebar-link-num">14</span>Histórico &amp; campanhas</a>
       <a class="sidebar-link" href="#bloco-15"><span class="sidebar-link-num">15</span>Indicadores operacionais</a>
+      <a class="sidebar-link" href="#bloco-16"><span class="sidebar-link-num">16</span>Pacientes &amp; diagnósticos</a>
     </nav>
 
     <div class="sidebar-actions-brief">
@@ -3703,10 +3704,6 @@
           <div class="field"><label class="field-label">Nome fantasia <span class="req">*</span></label><input type="text" data-field="b01_fantasia" placeholder="Ex: Clínica La Vie en Rose" /></div>
           <div class="field"><label class="field-label">CNPJ <span class="req">*</span></label><input type="text" data-field="b01_cnpj" placeholder="00.000.000/0000-00" /></div>
         </div>
-        <div class="field-row">
-          <div class="field"><label class="field-label">Inscrição estadual</label><span class="field-help">Deixe em branco se isenta.</span><input type="text" data-field="b01_ie" placeholder="—" /></div>
-          <div class="field"><label class="field-label">Inscrição municipal</label><input type="text" data-field="b01_im" placeholder="—" /></div>
-        </div>
         <div class="field">
           <label class="field-label">Regime tributário</label>
           <div class="options-row">
@@ -3752,7 +3749,6 @@
             <span class="option-pill"><input type="checkbox" id="b02_a4" data-field="b02_acess_libras" value="true" /><label for="b02_a4">Atendimento em Libras</label></span>
           </div>
         </div>
-        <div class="field"><label class="field-label">Unidade(s) secundária(s)</label><span class="field-help">Se houver outra unidade física (ex: Salvador) ou exclusivamente online.</span><textarea data-field="b02_unidades" class="tall" placeholder="Ex: Unidade Salvador (Rua Marquês de Caravelas, 407 — Barra) — operando em modalidade online."></textarea></div>
         <div class="field"><label class="field-label">Horários de funcionamento <span class="req">*</span></label><span class="field-help">Liste por dia da semana, com intervalos. Inclua se atendem feriados.</span><textarea data-field="b02_horarios" class="tall" placeholder="Ex:&#10;Segunda a sexta: 08h às 18h (intervalo 12h-13h)&#10;Sábado: 08h às 12h&#10;Domingo: fechado"></textarea></div>
         <div class="field">
           <label class="field-label">Modalidades de atendimento <span class="req">*</span></label>
@@ -3760,7 +3756,6 @@
             <span class="option-pill"><input type="checkbox" id="b02_m1" data-field="b02_mod_presencial" value="true" /><label for="b02_m1">Presencial</label></span>
             <span class="option-pill"><input type="checkbox" id="b02_m2" data-field="b02_mod_online" value="true" /><label for="b02_m2">Online</label></span>
             <span class="option-pill"><input type="checkbox" id="b02_m3" data-field="b02_mod_domiciliar" value="true" /><label for="b02_m3">Domiciliar</label></span>
-            <span class="option-pill"><input type="checkbox" id="b02_m4" data-field="b02_mod_internacional" value="true" /><label for="b02_m4">Internacional (telemedicina)</label></span>
           </div>
         </div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b02_obs" placeholder="Particularidades de logística, restrições, etc."></textarea></div>
@@ -3836,7 +3831,6 @@
             <span class="option-pill"><input type="radio" name="b04a_onde" id="b04a_o7" data-field="b04a_onde" value="Outro sistema" /><label for="b04a_o7">Outro</label></span>
           </div>
         </div>
-        <div class="field"><label class="field-label">Se marcou "outro" — qual?</label><input type="text" data-field="b04a_outro_qual" placeholder="Nome do sistema" /></div>
         <div class="field">
           <label class="field-label">A agenda é compartilhada entre você e os profissionais? <span class="req">*</span></label>
           <div class="options-row">
@@ -3846,16 +3840,6 @@
           </div>
         </div>
         <div class="field"><label class="field-label">Existe mais de uma agenda em paralelo?</label><textarea data-field="b04a_paralelas" class="tall" placeholder="Ex: Dr. Bruno tem Google Calendar pessoal, eu opero no Doctoralia. Às vezes batem em conflito."></textarea></div>
-        <div class="field">
-          <label class="field-label">Considerariam migrar tudo para o Google Calendar?</label>
-          <div class="options-row">
-            <span class="option-pill"><input type="radio" name="b04a_mig" id="b04a_m1" data-field="b04a_migrar_google" value="Sim, abertura total" /><label for="b04a_m1">Abertura total</label></span>
-            <span class="option-pill"><input type="radio" name="b04a_mig" id="b04a_m2" data-field="b04a_migrar_google" value="Sim, mas com receio" /><label for="b04a_m2">Sim, com receio</label></span>
-            <span class="option-pill"><input type="radio" name="b04a_mig" id="b04a_m3" data-field="b04a_migrar_google" value="Prefiro manter o atual" /><label for="b04a_m3">Prefiro o atual</label></span>
-            <span class="option-pill"><input type="radio" name="b04a_mig" id="b04a_m4" data-field="b04a_migrar_google" value="Não sei avaliar" /><label for="b04a_m4">Não sei avaliar</label></span>
-          </div>
-        </div>
-        <div class="field"><label class="field-label">Quantos calendários distintos precisariam?</label><span class="field-help">Ex: agenda do Dr. Bruno (presencial), agenda do Dr. Bruno (online), agenda de procedimentos (Cetamina, Spravato).</span><textarea data-field="b04a_calendarios" class="tall" placeholder="Liste um por linha."></textarea></div>
         <div class="field"><label class="field-label">Bloqueios fixos na agenda</label><span class="field-help">Almoço, dia de descanso, horário de supervisão, atendimento internacional em fuso específico.</span><textarea data-field="b04a_bloqueios" class="tall" placeholder="Ex:&#10;Dr. Bruno: terças e quintas 12h-14h (almoço)&#10;Sextas após 16h: reservado para estudo"></textarea></div>
         <div class="field"><label class="field-label">Duração padrão das consultas, por tipo</label><textarea data-field="b04a_duracoes" class="tall" placeholder="Ex:&#10;Primeira consulta: 90 min (Slow Medicine)&#10;Retorno: 50 min&#10;Procedimento Cetamina: 2h30&#10;Telemedicina retorno: 40 min"></textarea></div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04a_obs" placeholder="Exceções, pessoas que mexem fora do combinado, etc."></textarea></div>
@@ -3870,19 +3854,13 @@
         <p class="block-intro">Este é o bloco mais importante do briefing. Descreva com o máximo de detalhe possível como você decide o que decide — é exatamente essa lógica que vai virar o cérebro do bot. <em>O bot só será bom se conseguir copiar o que você já faz bem.</em></p>
         <div class="field"><label class="field-label">Quando alguém pede consulta — passo 1? Passo 2? Passo 3? <span class="req">*</span></label><span class="field-help">Descreva como se estivesse ensinando alguém novo.</span><textarea data-field="b04b_passos" class="tall" placeholder="Ex:&#10;1. Pergunto se é primeira vez ou retorno&#10;2. Se primeira vez, pergunto qual a queixa principal&#10;3. Confirmo se prefere presencial ou online&#10;4. Mando opções de horário..."></textarea></div>
         <div class="field"><label class="field-label">Como descobre se é paciente novo ou retorno?</label><textarea data-field="b04b_novo_retorno" placeholder="Há lista? Você confia na pessoa quando ela diz? Verifica por CPF?"></textarea></div>
-        <div class="field"><label class="field-label">Como decide para qual profissional encaminhar? <span class="req">*</span></label><textarea data-field="b04b_qual_profissional" class="tall" placeholder="Ex:&#10;Depressão resistente, TDAH adulto → Dr. Bruno&#10;Componente metabólico → endocrinologista + Dr. Bruno&#10;Sem diagnóstico → Dr. Bruno (triagem)"></textarea></div>
         <div class="field"><label class="field-label">Você faz alguma triagem antes de agendar?</label><textarea data-field="b04b_triagem" placeholder="Liste as perguntas que você faz na ordem."></textarea></div>
-        <div class="field"><label class="field-label">Como prioriza casos quando há fila? <span class="req">*</span></label><textarea data-field="b04b_prioridade" class="tall" placeholder="Ex:&#10;1º — Caso urgente (crise, ideação)&#10;2º — Paciente em tratamento (não pode atrasar retorno)&#10;3º — Indicação direta de paciente ativo&#10;4º — Primeira consulta (ordem de chegada)"></textarea></div>
-        <div class="field"><label class="field-label">Diferencia presencial vs online? Como decide?</label><textarea data-field="b04b_presencial_online" placeholder="O paciente escolhe livremente? Há critério clínico? Restrição de horário?"></textarea></div>
         <div class="field-row">
-          <div class="field"><label class="field-label">Quota máxima de consultas/dia por profissional?</label><input type="text" data-field="b04b_quota_dia" placeholder="Ex: Dr. Bruno até 6 primeiras consultas/dia" /></div>
+          <div class="field"><label class="field-label">Quota máxima de consultas/dia?</label><input type="text" data-field="b04b_quota_dia" placeholder="Ex: Dr. Bruno até 6 primeiras consultas/dia" /></div>
           <div class="field"><label class="field-label">Intervalo mínimo entre consultas?</label><input type="text" data-field="b04b_intervalo" placeholder="Ex: 10 min entre consultas" /></div>
         </div>
         <div class="field"><label class="field-label">Como confirma a consulta com o paciente?</label><textarea data-field="b04b_confirmacao" placeholder="Quando (na hora? 24h antes?), por qual canal, com qual texto."></textarea></div>
         <div class="field"><label class="field-label">Como lida com cancelamentos?</label><textarea data-field="b04b_cancelamento" placeholder="Há tolerância de horário? Multa? Lista de espera entra em ação?"></textarea></div>
-        <div class="field"><label class="field-label">Como lida com no-show?</label><textarea data-field="b04b_no_show" placeholder=""></textarea></div>
-        <div class="field"><label class="field-label">Há lista de espera ativa? Como opera?</label><textarea data-field="b04b_lista_espera" placeholder="Quando alguém cancela, como você decide quem chamar?"></textarea></div>
-        <div class="field"><label class="field-label">O que faz quando alguém pede um horário que não tem?</label><textarea data-field="b04b_sem_horario" placeholder="Tenta convencer para outro? Coloca em espera? Encaminha?"></textarea></div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04b_obs" placeholder="Há regras não escritas? Exceções que sempre acontecem?"></textarea></div>
       </div>
     </div>
@@ -3895,7 +3873,6 @@
         <p class="block-intro">O texto literal que você manda no WhatsApp hoje é o <em>material de treinamento</em> do bot. Não precisa polir — pode copiar e colar do próprio WhatsApp se quiser.</p>
         <div class="field"><label class="field-label">Os 5 tipos de mensagem mais comuns que você recebe <span class="req">*</span></label><textarea data-field="b04c_top5_mensagens" class="tall" placeholder="Ex:&#10;1. Pedido de renovação de receita&#10;2. Solicitação de primeira consulta&#10;3. Dúvida sobre valor / forma de pagamento&#10;4. Confirmação ou reagendamento&#10;5. Pedido de atestado / declaração"></textarea></div>
         <div class="field"><label class="field-label">Para cada um dos 5 tipos — qual é a sua resposta padrão? <span class="req">*</span></label><span class="field-help">Texto literal. Cole exemplos reais se puder.</span><textarea data-field="b04c_respostas_padrao" class="tall" style="min-height:280px" placeholder="Ex:&#10;1. Renovação:&#10;'Oi, [nome]! Vou pedir pro Dr. Bruno renovar...'&#10;&#10;2. Primeira consulta:&#10;'Olá! Que bom que entrou em contato...'"></textarea></div>
-        <div class="field"><label class="field-label">Você usa atalhos, templates ou respostas salvas?</label><textarea data-field="b04c_templates" placeholder="Liste os atalhos/templates que você já tem."></textarea></div>
         <div class="field"><label class="field-label">Quando uma mensagem vira "caso para o Dr. Bruno"? <span class="req">*</span></label><textarea data-field="b04c_escalonamento" class="tall" placeholder="Ex:&#10;- Pergunta sobre ajuste de medicação&#10;- Sinal de crise ou desespero&#10;- Mensagem em inglês (atendimento internacional)"></textarea></div>
         <div class="field" style="background:rgba(200,122,90,0.08);border-left:3px solid #c87a5a;padding:1.4rem;border-radius:0 12px 12px 0;">
           <label class="field-label" style="color:#c87a5a;">Renovação de receita — operação atual</label>
@@ -3903,11 +3880,7 @@
           <textarea data-field="b04c_receitas" class="tall" style="min-height:200px" placeholder="Ex:&#10;1. Paciente manda mensagem pedindo renovação&#10;2. Confirmo nome e medicamento&#10;3. Encaminho pro Dr. Bruno (grupo interno do WhatsApp)&#10;4. Dr. Bruno autoriza quando tem tempo&#10;5. Emito pelo Memed e mando o link&#10;&#10;Tempo médio: algumas horas até 2 dias úteis."></textarea>
         </div>
         <div class="field"><label class="field-label">Protocolo de crise (ideação suicida, surto, emergência)</label><textarea data-field="b04c_crise" class="tall" placeholder="Ex:&#10;- Respondo na hora, mesmo fora do horário&#10;- Mando CVV (188) e emergência psiquiátrica&#10;- Aciono Dr. Bruno por ligação"></textarea></div>
-        <div class="field"><label class="field-label">Como lida com perguntas sobre <em style="color:var(--gold);font-style:normal">valores</em>?</label><textarea data-field="b04c_valores" placeholder="Passa direto? Tenta agendar antes? Há tabela pública?"></textarea></div>
-        <div class="field"><label class="field-label">Como lida com pacientes que querem cancelar tratamento ou faltam reiteradamente?</label><textarea data-field="b04c_evasao" placeholder=""></textarea></div>
-        <div class="field"><label class="field-label">Mensagens fora do horário comercial — como são tratadas hoje?</label><textarea data-field="b04c_fora_horario" placeholder="Há resposta automática? Aviso de horário?"></textarea></div>
         <div class="field"><label class="field-label">Volume de mensagens que <em style="color:var(--gold);font-style:normal">não conseguem</em> ser respondidas no mesmo dia</label><input type="text" data-field="b04c_atrasadas" placeholder="Ex: ~5 a 10 mensagens/dia ficam para o dia seguinte" /></div>
-        <div class="field"><label class="field-label">Há atendimento em outras línguas (inglês, espanhol, francês)?</label><span class="field-help">O painel cita atendimento internacional (França, EUA, Canadá, Irlanda). Quem responde nessas línguas hoje?</span><textarea data-field="b04c_idiomas" placeholder=""></textarea></div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04c_obs" placeholder="O que mais te consome no WhatsApp hoje?"></textarea></div>
       </div>
     </div>
@@ -3925,30 +3898,6 @@
         <div class="field"><label class="field-label">Quais ações o bot deveria resolver <em style="color:var(--gold);font-style:normal">100% sozinho</em>? <span class="req">*</span></label><textarea data-field="b04d_bot_100" class="tall" placeholder="Ex:&#10;- Informar valor e formas de pagamento&#10;- Mandar endereço + link do Google Maps&#10;- Confirmar consulta no dia anterior&#10;- Enviar link da telemedicina"></textarea></div>
         <div class="field"><label class="field-label">Quais ações o bot <em style="color:#c87a5a;font-style:normal">NUNCA</em> deve resolver sem você ou sem o Dr. Bruno? <span class="req">*</span></label><textarea data-field="b04d_bot_nunca" class="tall" placeholder="Ex:&#10;- Qualquer coisa sobre medicação&#10;- Mensagens com sinal de crise&#10;- Cancelamento de tratamento&#10;- Pedidos de atestado / laudo"></textarea></div>
         <div class="field"><label class="field-label">Horários em que o bot deve operar <em style="color:var(--gold);font-style:normal">sem você</em>?</label><textarea data-field="b04d_horarios_bot" placeholder="Ex: Fora do horário comercial (18h-8h), finais de semana, feriados."></textarea></div>
-        <div class="field">
-          <label class="field-label">Tom de voz do bot</label>
-          <div class="options-row">
-            <span class="option-pill"><input type="radio" name="b04d_tom" id="b04d_t1" data-field="b04d_tom" value="Formal e respeitoso" /><label for="b04d_t1">Formal</label></span>
-            <span class="option-pill"><input type="radio" name="b04d_tom" id="b04d_t2" data-field="b04d_tom" value="Próximo e acolhedor" /><label for="b04d_t2">Próximo</label></span>
-            <span class="option-pill"><input type="radio" name="b04d_tom" id="b04d_t3" data-field="b04d_tom" value="Neutro e direto" /><label for="b04d_t3">Neutro</label></span>
-            <span class="option-pill"><input type="radio" name="b04d_tom" id="b04d_t4" data-field="b04d_tom" value="Casual e amigável" /><label for="b04d_t4">Casual</label></span>
-          </div>
-        </div>
-        <div class="field"><label class="field-label">Como o bot se apresentaria na primeira mensagem?</label><textarea data-field="b04d_apresentacao" placeholder="Ex: 'Oi! Sou a assistente virtual da La Vie en Rose. Posso ajudar com agendamentos, dúvidas sobre valores, localização e renovação de receita...'"></textarea></div>
-        <div class="field-row">
-          <div class="field"><label class="field-label">Nome sugerido para o bot</label><span class="field-help">Ex: Vie, Rosa, Sofia, ou simplesmente "Assistente".</span><input type="text" data-field="b04d_nome_bot" placeholder="Ex: Vie" /></div>
-          <div class="field"><label class="field-label">Nomes que <em style="color:#c87a5a;font-style:normal">não</em> deveriam ser usados</label><input type="text" data-field="b04d_nome_bot_nao" placeholder="" /></div>
-        </div>
-        <div class="field">
-          <label class="field-label">De 0 a 10 — quanto você se sente confortável com a chegada do bot?</label>
-          <div class="options-row">
-            <span class="option-pill"><input type="radio" name="b04d_conf" id="b04d_c0" data-field="b04d_confortavel" value="0-3" /><label for="b04d_c0">0–3 · receio</label></span>
-            <span class="option-pill"><input type="radio" name="b04d_conf" id="b04d_c1" data-field="b04d_confortavel" value="4-6" /><label for="b04d_c1">4–6 · neutra</label></span>
-            <span class="option-pill"><input type="radio" name="b04d_conf" id="b04d_c2" data-field="b04d_confortavel" value="7-10" /><label for="b04d_c2">7–10 · animada</label></span>
-          </div>
-        </div>
-        <div class="field"><label class="field-label">Tarefas que você gostaria de <em style="color:var(--gold);font-style:normal">nunca mais</em> fazer</label><textarea data-field="b04d_largar" placeholder="Liste sem culpa. Isso vira prioridade para automação."></textarea></div>
-        <div class="field"><label class="field-label">Tarefas que você <em style="color:var(--cream-bright);font-style:normal">faz questão</em> de manter</label><textarea data-field="b04d_manter" placeholder="O que dá significado ao seu trabalho?"></textarea></div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b04d_obs" placeholder="Receios, expectativas, sugestões."></textarea></div>
       </div>
     </div>
@@ -4007,16 +3956,6 @@
         </div>
         <div class="field"><label class="field-label">E-mail responsável pela conta da registradora</label><input type="email" data-field="b06_registradora_email" placeholder="email@exemplo.com" /></div>
         <div class="field"><label class="field-label">E-mails institucionais existentes</label><span class="field-help">Liste todos os e-mails @dominioproprio que já funcionam. Indique quem usa cada um.</span><textarea data-field="b06_emails_existentes" class="tall" placeholder="Ex:&#10;contato@lavieenroseclinica.com.br — secretária&#10;dr.bruno@lavieenroseclinica.com.br — Dr. Bruno"></textarea></div>
-        <div class="field">
-          <label class="field-label">Plataforma dos e-mails institucionais</label>
-          <div class="options-row">
-            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p1" data-field="b06_plataforma_email" value="Google Workspace" /><label for="b06_p1">Google Workspace</label></span>
-            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p2" data-field="b06_plataforma_email" value="Zoho Mail" /><label for="b06_p2">Zoho Mail</label></span>
-            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p3" data-field="b06_plataforma_email" value="Microsoft 365" /><label for="b06_p3">Microsoft 365</label></span>
-            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p4" data-field="b06_plataforma_email" value="Gmail pessoal" /><label for="b06_p4">Gmail pessoal</label></span>
-            <span class="option-pill"><input type="radio" name="b06_plat" id="b06_p5" data-field="b06_plataforma_email" value="Não há e-mail institucional" /><label for="b06_p5">Não há</label></span>
-          </div>
-        </div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b06_obs" placeholder="Há contratos prestes a vencer, e-mails antigos a desativar?"></textarea></div>
       </div>
     </div>
@@ -4058,7 +3997,6 @@
             </div>
           </div>
         </div>
-        <div class="field"><label class="field-label">Se atende convênio — quais?</label><input type="text" data-field="b07_convenios_lista" placeholder="Ex: Bradesco Saúde, SulAmérica, Unimed..." /></div>
         <div class="field"><label class="field-label">Há CRM de pacientes?</label><input type="text" data-field="b07_crm" placeholder="Ex: RD Station, HubSpot, planilha, não há..." /></div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b07_obs" placeholder="Sistemas que não funcionam bem, integrações desejadas..."></textarea></div>
       </div>
@@ -4070,34 +4008,6 @@
       <div class="block-body">
         <h3 class="block-title">O que <em>já existe</em> de identidade visual.</h3>
         <p class="block-intro">Logos, fotos, vídeos, materiais impressos. Vamos avaliar o que aproveitar e o que recriar. Indique apenas se existe e o nome do arquivo na pasta "Arquivos" do Drive.</p>
-        <div class="field">
-          <label class="field-label">Logo atual da clínica</label>
-          <div class="options-row">
-            <span class="option-pill"><input type="radio" name="b08_logo" id="b08_l1" data-field="b08_logo_existe" value="Existe em alta resolução" /><label for="b08_l1">Em alta resolução</label></span>
-            <span class="option-pill"><input type="radio" name="b08_logo" id="b08_l2" data-field="b08_logo_existe" value="Existe só em baixa" /><label for="b08_l2">Só em baixa</label></span>
-            <span class="option-pill"><input type="radio" name="b08_logo" id="b08_l3" data-field="b08_logo_existe" value="Não existe" /><label for="b08_l3">Não existe</label></span>
-          </div>
-        </div>
-        <div class="field"><label class="field-label">Se existe — nome do(s) arquivo(s) na pasta "Arquivos"</label><input type="text" data-field="b08_logo_arquivo" placeholder="Ex: logo_atual_alta.png, logo_atual.ai" /></div>
-        <div class="field-row">
-          <div class="field">
-            <label class="field-label">Há manual de marca atual?</label>
-            <div class="options-row">
-              <span class="option-pill"><input type="radio" name="b08_manual" id="b08_mn1" data-field="b08_manual" value="Sim" /><label for="b08_mn1">Sim</label></span>
-              <span class="option-pill"><input type="radio" name="b08_manual" id="b08_mn2" data-field="b08_manual" value="Não" /><label for="b08_mn2">Não</label></span>
-            </div>
-          </div>
-          <div class="field">
-            <label class="field-label">Há paleta de cores oficial?</label>
-            <div class="options-row">
-              <span class="option-pill"><input type="radio" name="b08_paleta" id="b08_pa1" data-field="b08_paleta" value="Sim" /><label for="b08_pa1">Sim</label></span>
-              <span class="option-pill"><input type="radio" name="b08_paleta" id="b08_pa2" data-field="b08_paleta" value="Sim, mas não documentada" /><label for="b08_pa2">Informal</label></span>
-              <span class="option-pill"><input type="radio" name="b08_paleta" id="b08_pa3" data-field="b08_paleta" value="Não" /><label for="b08_pa3">Não</label></span>
-            </div>
-          </div>
-        </div>
-        <div class="field"><label class="field-label">Fotos profissionais existentes</label><textarea data-field="b08_fotos" placeholder="Ex:&#10;~30 fotos do Dr. Bruno tiradas em 2023 (em /Arquivos/fotos_bruno_2023)&#10;~15 fotos da clínica"></textarea></div>
-        <div class="field"><label class="field-label">Vídeos institucionais existentes</label><textarea data-field="b08_videos" placeholder="Ex: vídeo de apresentação gravado em 2024, 2 min, em alta resolução"></textarea></div>
         <div class="field"><label class="field-label">Materiais impressos</label><textarea data-field="b08_impressos" placeholder="Ex: cartão de visita atual, papel de prescrição em papelaria"></textarea></div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b08_obs" placeholder="Material antigo a descontinuar? Identidade da época da fundação a resgatar?"></textarea></div>
       </div>
@@ -4108,13 +4018,9 @@
       <div class="block-marker"><div class="block-num">13</div><div class="block-label">Parceiros &amp; fornecedores</div></div>
       <div class="block-body">
         <h3 class="block-title">Quem <em>orbita</em> a clínica.</h3>
-        <p class="block-intro">Contador, advogado, designer atual, fotógrafo, agência de marketing anterior. Saber quem já está envolvido evita atritos e duplicidades.</p>
+        <p class="block-intro">Contador, advogado, designer atual, fotógrafo, etc.. Saber quem já está envolvido evita atritos e duplicidades.</p>
         <div class="field"><label class="field-label">Advogado(a) — especialmente para LGPD e CFM</label><textarea data-field="b09_advogado" placeholder="Nome — área de atuação — contato"></textarea></div>
-        <div class="field"><label class="field-label">Designer ou agência atual</label><textarea data-field="b09_designer" placeholder="Nome — escopo do trabalho — contato — status (ativo/pausado/encerrado)"></textarea></div>
         <div class="field"><label class="field-label">Fotógrafo(a) de confiança</label><textarea data-field="b09_fotografo" placeholder="Nome — estilo — contato"></textarea></div>
-        <div class="field"><label class="field-label">Editor(a) de vídeo / videomaker</label><textarea data-field="b09_videomaker" placeholder="Nome — escopo — contato"></textarea></div>
-        <div class="field"><label class="field-label">Outros fornecedores ativos</label><textarea data-field="b09_outros_fornecedores" class="tall" placeholder="Liste um por linha."></textarea></div>
-        <div class="field"><label class="field-label">Há contrato vigente com outra agência ou freelancer?</label><textarea data-field="b09_contrato_vigente" placeholder="Sim/não, com quem, qual escopo, quando vence."></textarea></div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b09_obs" placeholder=""></textarea></div>
       </div>
     </div>
@@ -4126,8 +4032,6 @@
         <h3 class="block-title">A <em>memória</em> de marketing.</h3>
         <p class="block-intro">Tudo que já foi tentado, com resultado bom ou ruim. Uma das seções mais valiosas — evita repetir erros e potencializa o que já deu certo.</p>
         <div class="field"><label class="field-label">Há quanto tempo a clínica existe?</label><input type="text" data-field="b10_idade_clinica" placeholder="Ex: 4 anos (fundada em 2022)" /></div>
-        <div class="field"><label class="field-label">Trabalhos de marketing já realizados</label><textarea data-field="b10_trabalhos_anteriores" class="tall" placeholder="Ex:&#10;2023 — Google Ads (3 meses, R$ 2k/mês) — gerou ~8 consultas&#10;2024 — social media com agência X (6 meses) — não funcionou"></textarea></div>
-        <div class="field"><label class="field-label">Há campanha ativa agora?</label><textarea data-field="b10_campanha_ativa" placeholder="Se sim: plataforma, investimento mensal, quem gerencia."></textarea></div>
         <div class="field"><label class="field-label">Datas importantes do ano para a clínica</label><span class="field-help">Aniversário da clínica, aniversário do Dr. Bruno, sazonalidades de atendimento.</span><textarea data-field="b10_datas" class="tall" placeholder="Ex:&#10;Janeiro — alta procura pós-festas&#10;Aniversário da clínica: 15 de março&#10;Setembro Amarelo: pico de demanda institucional&#10;Dezembro — queda forte de agendamentos"></textarea></div>
         <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b10_obs" placeholder=""></textarea></div>
       </div>
@@ -4170,6 +4074,53 @@
           </div>
         </div>
         <div class="field"><label class="field-label">Observações finais — qualquer coisa que importe e não foi perguntada</label><textarea data-field="b11_obs_geral" class="tall" placeholder="Use este espaço para o que ficou de fora dos blocos anteriores."></textarea></div>
+      </div>
+    </div>
+
+    <!-- BLOCO 16 -->
+    <div class="block" id="bloco-16">
+      <div class="block-marker"><div class="block-num">16</div><div class="block-label">Pacientes &amp; diagnósticos</div></div>
+      <div class="block-body">
+        <h3 class="block-title">Quem são os seus <em>pacientes</em>.</h3>
+        <p class="block-intro">Entender o perfil real de quem você já atende — e de quem você quer atrair — é o que transforma comunicação genérica em conteúdo que ressoa. Seja honesto: não há resposta certa.</p>
+
+        <div class="field"><label class="field-label">Quais os principais diagnósticos dos seus pacientes hoje? <span class="req">*</span></label><span class="field-help">Liste por ordem de frequência. Estimativas são suficientes.</span><textarea data-field="b16_diagnosticos" class="tall" placeholder="Ex:&#10;1. Depressão maior — ~35%&#10;2. Transtorno de ansiedade generalizada — ~25%&#10;3. TDAH adulto — ~20%&#10;4. Transtorno bipolar — ~10%&#10;5. Outros — ~10%"></textarea></div>
+
+        <div class="field"><label class="field-label">Quais diagnósticos você <em style="color:var(--gold);font-style:normal">não</em> atende ou prefere não atender?</label><span class="field-help">Ex: dependência química grave, psicoses agudas sem suporte familiar, transtornos de personalidade sem co-tratamento.</span><textarea data-field="b16_diagnosticos_nao" placeholder="Liste sem cerimônia."></textarea></div>
+
+        <div class="field"><label class="field-label">Qual o perfil de paciente que você deseja <em style="color:var(--gold);font-style:normal">atrair</em>? <span class="req">*</span></label><span class="field-help">Pense em faixa etária, contexto de vida, nível de engajamento no tratamento, etc.</span><textarea data-field="b16_perfil_ideal" class="tall" placeholder="Ex:&#10;Adultos entre 28 e 50 anos, com vida profissional ativa, que já fizeram terapia antes e buscam abordagem mais aprofundada. Pacientes que valorizam explicação clínica e participam do próprio tratamento."></textarea></div>
+
+        <div class="field-row">
+          <div class="field"><label class="field-label">Faixa etária predominante hoje</label><input type="text" data-field="b16_faixa_etaria" placeholder="Ex: 25 a 45 anos" /></div>
+          <div class="field"><label class="field-label">Distribuição por sexo (estimativa)</label><input type="text" data-field="b16_sexo" placeholder="Ex: 65% mulheres, 35% homens" /></div>
+        </div>
+
+        <div class="field"><label class="field-label">Tempo médio que um paciente fica em tratamento com você</label><span class="field-help">Desde a primeira consulta até a alta ou encerramento.</span>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b16_tempo" id="b16_t1" data-field="b16_tempo_tratamento" value="Menos de 6 meses" /><label for="b16_t1">Menos de 6 meses</label></span>
+            <span class="option-pill"><input type="radio" name="b16_tempo" id="b16_t2" data-field="b16_tempo_tratamento" value="6 meses a 1 ano" /><label for="b16_t2">6 meses–1 ano</label></span>
+            <span class="option-pill"><input type="radio" name="b16_tempo" id="b16_t3" data-field="b16_tempo_tratamento" value="1 a 3 anos" /><label for="b16_t3">1 a 3 anos</label></span>
+            <span class="option-pill"><input type="radio" name="b16_tempo" id="b16_t4" data-field="b16_tempo_tratamento" value="Mais de 3 anos" /><label for="b16_t4">Mais de 3 anos</label></span>
+            <span class="option-pill"><input type="radio" name="b16_tempo" id="b16_t5" data-field="b16_tempo_tratamento" value="Varia muito por caso" /><label for="b16_t5">Varia muito</label></span>
+          </div>
+        </div>
+
+        <div class="field"><label class="field-label">Como a maioria dos pacientes chega até você — com que nível de diagnóstico?</label>
+          <div class="options-row">
+            <span class="option-pill"><input type="radio" name="b16_chegada" id="b16_ch1" data-field="b16_chegada_diagnostico" value="Sem diagnóstico — é a primeira vez que buscam ajuda" /><label for="b16_ch1">Sem diagnóstico prévio</label></span>
+            <span class="option-pill"><input type="radio" name="b16_chegada" id="b16_ch2" data-field="b16_chegada_diagnostico" value="Com suspeita ou autodiagnóstico" /><label for="b16_ch2">Suspeita / autodiagnóstico</label></span>
+            <span class="option-pill"><input type="radio" name="b16_chegada" id="b16_ch3" data-field="b16_chegada_diagnostico" value="Diagnóstico estabelecido por outro profissional" /><label for="b16_ch3">Diagnóstico prévio</label></span>
+            <span class="option-pill"><input type="radio" name="b16_chegada" id="b16_ch4" data-field="b16_chegada_diagnostico" value="Misto — de tudo um pouco" /><label for="b16_ch4">Misto</label></span>
+          </div>
+        </div>
+
+        <div class="field"><label class="field-label">Há algum subgrupo de pacientes que exige atenção ou protocolo especial?</label><span class="field-help">Ex: adolescentes que precisam de consentimento dos pais, pacientes em uso de psicotrópicos controlados, situações de risco.</span><textarea data-field="b16_subgrupos" placeholder="Descreva o grupo e o que muda no fluxo para ele."></textarea></div>
+
+        <div class="field"><label class="field-label">Qual a principal <em style="color:var(--gold);font-style:normal">dor</em> que traz o paciente até você — na voz dele, não na sua?</label><span class="field-help">O que ele diz na primeira mensagem? "Não consigo parar de me sentir...", "Meu psiquiatra anterior...", etc.</span><textarea data-field="b16_dor_paciente" class="tall" placeholder="Ex:&#10;— 'Não consigo trabalhar direito, tô sempre ansioso'&#10;— 'Já tentei terapia mas sinto que precisava de algo a mais'&#10;— 'Me indicaram você especificamente'&#10;— 'Tô sem ânimo há meses e não sei o que está acontecendo'"></textarea></div>
+
+        <div class="field"><label class="field-label">Existe algum perfil de paciente que você atende bem <em style="color:var(--cream-bright);font-style:normal">mas que não está sendo comunicado para fora</em>?</label><span class="field-help">Uma especialidade invisível — que só seus pacientes atuais sabem, mas que não aparece no seu perfil público.</span><textarea data-field="b16_especialidade_invisivel" placeholder="Ex: Atendo muito bem TDAH em profissionais de alta performance, mas nunca criei conteúdo específico sobre isso."></textarea></div>
+
+        <div class="field"><label class="field-label">Observações deste bloco</label><textarea data-field="b16_obs" placeholder="Padrões que você nota na sua carteira de pacientes que não cabem nas perguntas acima."></textarea></div>
       </div>
     </div>
 
