@@ -960,9 +960,154 @@
     .contract, .timeline-block, .question { background: rgba(31, 47, 55, 0.85) !important; }
     .question-notes textarea, .ref-chip, .question-aside { background: rgba(13, 21, 25, 0.85) !important; }
   }
+
+  /* ============ LOGIN GATE ============ */
+  body.login-active .sidebar,
+  body.login-active main,
+  body.login-active .sidebar-toggle,
+  body.login-active .toast { visibility: hidden; }
+
+  .login-gate {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  .login-gate::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(200, 151, 90, 0.1), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(70, 98, 112, 0.15), transparent 60%);
+    pointer-events: none;
+  }
+  .login-gate.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .login-card {
+    position: relative;
+    max-width: 440px;
+    width: 100%;
+    padding: 3rem 2.5rem;
+    background: rgba(13, 21, 25, 0.35);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(232, 221, 200, 0.28);
+    border-radius: 22px;
+    text-align: center;
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 24px 80px rgba(0, 0, 0, 0.55),
+      0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  .login-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
+    pointer-events: none;
+    border-radius: 22px 22px 0 0;
+  }
+  .login-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .login-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--cream-bright);
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+  .login-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    margin-bottom: 2rem;
+  }
+  .login-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: rgba(13, 21, 25, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--cream-bright);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .login-input:focus { border-color: var(--gold-dim); background: rgba(13,21,25,0.7); }
+  .login-btn {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: var(--gold);
+    border: none;
+    border-radius: 10px;
+    color: var(--bg-deep);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .login-btn:hover { background: var(--gold-bright); }
+  .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-error {
+    color: #d68a8a;
+    font-size: 0.82rem;
+    margin-top: 0.8rem;
+    min-height: 1.2em;
+  }
+  .login-hint {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    letter-spacing: 0.05em;
+  }
 </style>
 </head>
 <body>
+
+<!-- ========== LOGIN GATE ========== -->
+<div class="login-gate" id="loginGate">
+  <div class="login-card">
+    <div class="login-eyebrow">La Vie en Rose</div>
+    <h1 class="login-title">Estratégia</h1>
+    <p class="login-subtitle">Acesso restrito · Posicionamento &amp; Narrativa</p>
+    <input
+      type="password"
+      class="login-input"
+      id="loginInput"
+      placeholder="Senha de acesso"
+      autocomplete="current-password"
+      autofocus
+    />
+    <button class="login-btn" id="loginBtn">Entrar</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">Sincronização em nuvem · Supabase</div>
+  </div>
+</div>
 
 <!-- ========== SIDEBAR TOGGLE (mobile) ========== -->
 <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menu">☰</button>
@@ -1589,122 +1734,34 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const STORAGE_NOTES = "lvr_briefing_02_notes_v1";
-  const STORAGE_FLAGS = "lvr_briefing_02_flags_v1";
-  const STORAGE_PILLS = "lvr_estrategia_pills_v1";
-
   // ============================================================
-  // NOTES PERSISTENCE
+  // SUPABASE
   // ============================================================
-  function loadNotes() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_NOTES) || "{}"); }
-    catch { return {}; }
-  }
-  function saveNotes(notes) { localStorage.setItem(STORAGE_NOTES, JSON.stringify(notes)); }
-  function loadFlags() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_FLAGS) || "{}"); }
-    catch { return {}; }
-  }
-  function saveFlags(flags) { localStorage.setItem(STORAGE_FLAGS, JSON.stringify(flags)); }
+  const SB_URL  = "https://odijbzgdewzkbuvrusoj.supabase.co";
+  const SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kaWpiemdkZXd6a2J1dnJ1c29qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MDUwODYsImV4cCI6MjA5MzM4MTA4Nn0.-U_zO_QBmzOa8Av0wDvbu5Vy1AkxSweooxV6yT1-Ht8";
+  const HEADERS = { "Content-Type": "application/json", "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY };
 
-  function attachNoteListener(textarea) {
-    const id = textarea.dataset.q;
-    textarea.addEventListener("input", () => {
-      const notes = loadNotes();
-      notes[id] = textarea.value;
-      saveNotes(notes);
+  async function sbGet(table, filters = "") {
+    const res = await fetch(`${SB_URL}/rest/v1/${table}?${filters}`, { headers: HEADERS });
+    return res.ok ? res.json() : [];
+  }
+
+  async function sbUpsert(table, body) {
+    await fetch(`${SB_URL}/rest/v1/${table}`, {
+      method: "POST",
+      headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
+      body: JSON.stringify(body)
     });
   }
 
-  function toggleFlag(btn) {
-    const question = btn.closest(".question");
-    const textarea = question.querySelector("textarea[data-q]");
-    const id = textarea.dataset.q;
-    const flags = loadFlags();
-    const isFlagged = !flags[id];
-    flags[id] = isFlagged;
-    saveFlags(flags);
-    btn.classList.toggle("active", isFlagged);
-    question.classList.toggle("flagged", isFlagged);
-  }
-
-  function restoreNotes() {
-    const notes = loadNotes();
-    const flags = loadFlags();
-    document.querySelectorAll("textarea[data-q]").forEach(t => {
-      const id = t.dataset.q;
-      if (notes[id]) t.value = notes[id];
-      if (flags[id]) {
-        const question = t.closest(".question");
-        const flagBtn = question.querySelector(".flag-btn");
-        question.classList.add("flagged");
-        if (flagBtn) flagBtn.classList.add("active");
-      }
-    });
+  async function sbDelete(table, filters = "") {
+    await fetch(`${SB_URL}/rest/v1/${table}?${filters}`, { method: "DELETE", headers: HEADERS });
   }
 
   // ============================================================
-  // EXPORT
+  // SYNC INDICATOR
   // ============================================================
-  function exportNotes() {
-    const notes = loadNotes();
-    const flags = loadFlags();
-    const blocks = {
-      "01_historia": ["q011", "q012", "q013", "q014"],
-      "02_pessoa": ["q021", "q022", "q023", "q024", "q025"],
-      "03_paciente": ["q031", "q032", "q033", "q034", "q035", "q036"],
-      "04_voz_tabu": ["q041", "q042", "q043", "q044", "q045"],
-      "05_casos_cenas": ["q051", "q052", "q053", "q054"],
-      "06_visao": ["q061", "q062", "q063", "q064"]
-    };
-    const blockTitles = {
-      "01_historia": "Bloco 01 — A história",
-      "02_pessoa": "Bloco 02 — A pessoa",
-      "03_paciente": "Bloco 03 — O paciente",
-      "04_voz_tabu": "Bloco 04 — Voz e tabu",
-      "05_casos_cenas": "Bloco 05 — Casos e cenas",
-      "06_visao": "Bloco 06 — Visão"
-    };
-    const result = {
-      project: "La Vie en Rose · Estratégia — Posicionamento & Narrativa",
-      version: "1.0",
-      exportedAt: new Date().toISOString(),
-      flaggedQuestions: Object.keys(flags).filter(k => flags[k]),
-      blocks: {}
-    };
-    Object.entries(blocks).forEach(([key, qIds]) => {
-      result.blocks[key] = { title: blockTitles[key], answers: {} };
-      qIds.forEach(qId => {
-        if (notes[qId]) {
-          result.blocks[key].answers[qId] = { text: notes[qId], flagged: !!flags[qId] };
-        }
-      });
-    });
-    const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `lvr-briefing-02-anotacoes-${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast("Anotações exportadas");
-  }
-
-  function resetNotes() {
-    if (!confirm("Apagar todas as anotações desta reunião? Não dá pra desfazer.")) return;
-    localStorage.removeItem(STORAGE_NOTES);
-    localStorage.removeItem(STORAGE_FLAGS);
-    document.querySelectorAll("textarea[data-q]").forEach(t => t.value = "");
-    document.querySelectorAll(".question").forEach(q => q.classList.remove("flagged"));
-    document.querySelectorAll(".flag-btn").forEach(b => b.classList.remove("active"));
-    showToast("Anotações apagadas");
-  }
-
-  // ============================================================
-  // UI
-  // ============================================================  const toastEl = document.getElementById("toast");
+  const toastEl = document.getElementById("toast");
   let toastTimer;
   function showToast(msg) {
     toastEl.textContent = msg;
@@ -1713,25 +1770,193 @@
     toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3000);
   }
 
-  // Scroll spy — atualiza timeline cards E links da sidebar
+  // Fila de debounce por question_id
+  const debounceTimers = {};
+  function debounce(id, fn, ms = 900) {
+    clearTimeout(debounceTimers[id]);
+    debounceTimers[id] = setTimeout(fn, ms);
+  }
+
+  // ============================================================
+  // NOTES — Supabase
+  // ============================================================
+  async function restoreNotes() {
+    try {
+      const [noteRows, pillRows] = await Promise.all([
+        sbGet("lvr_estrategia_notes", "select=question_id,content,flagged"),
+        sbGet("lvr_estrategia_pills", "select=pill_group,pill_value,selected&selected=eq.true")
+      ]);
+
+      // Textareas
+      noteRows.forEach(row => {
+        const t = document.querySelector(`textarea[data-q="${row.question_id}"]`);
+        if (!t) return;
+        t.value = row.content || "";
+        if (row.flagged) {
+          const q = t.closest(".question");
+          const btn = q && q.querySelector(".flag-btn");
+          if (q) q.classList.add("flagged");
+          if (btn) btn.classList.add("active");
+        }
+      });
+
+      // Pills
+      pillRows.forEach(row => {
+        const pill = document.querySelector(
+          `.tone-pill[data-group="${row.pill_group}"][data-value="${row.pill_value}"]`
+        );
+        if (pill) pill.classList.add("selected");
+      });
+    } catch (e) {
+      console.warn("Supabase restore error:", e);
+    }
+  }
+
+  function attachNoteListener(textarea) {
+    const id = textarea.dataset.q;
+    textarea.addEventListener("input", () => {
+      debounce(id, async () => {
+        try {
+          const flagged = textarea.closest(".question")?.classList.contains("flagged") ?? false;
+          await sbUpsert("lvr_estrategia_notes", { question_id: id, content: textarea.value, flagged });
+        } catch (e) { console.warn("Save note error:", e); }
+      });
+    });
+  }
+
+  async function toggleFlag(btn) {
+    const question = btn.closest(".question");
+    const textarea = question.querySelector("textarea[data-q]");
+    const id = textarea.dataset.q;
+    const isFlagged = !question.classList.contains("flagged");
+    btn.classList.toggle("active", isFlagged);
+    question.classList.toggle("flagged", isFlagged);
+    try {
+      await sbUpsert("lvr_estrategia_notes", {
+        question_id: id,
+        content: textarea.value,
+        flagged: isFlagged
+      });
+    } catch (e) { console.warn("Save flag error:", e); }
+  }
+
+  // ============================================================
+  // TONE PILLS — Supabase
+  // ============================================================
+  function initPills() {
+    document.querySelectorAll(".tone-pill").forEach(pill => {
+      pill.addEventListener("click", async () => {
+        pill.classList.toggle("selected");
+        const selected = pill.classList.contains("selected");
+        try {
+          await sbUpsert("lvr_estrategia_pills", {
+            pill_group: pill.dataset.group,
+            pill_value: pill.dataset.value,
+            selected
+          });
+        } catch (e) { console.warn("Save pill error:", e); }
+      });
+    });
+  }
+
+  // ============================================================
+  // EXPORT
+  // ============================================================
+  async function exportNotes() {
+    try {
+      const [noteRows, pillRows] = await Promise.all([
+        sbGet("lvr_estrategia_notes", "select=question_id,content,flagged"),
+        sbGet("lvr_estrategia_pills", "select=pill_group,pill_value,selected&selected=eq.true")
+      ]);
+
+      const blockTitles = {
+        "01_historia":    "Bloco 01 — A história",
+        "02_pessoa":      "Bloco 02 — A pessoa",
+        "03_paciente":    "Bloco 03 — O paciente",
+        "04_voz_tabu":    "Bloco 04 — Voz e tabu",
+        "05_casos_cenas": "Bloco 05 — Casos e cenas",
+        "06_visao":       "Bloco 06 — Visão"
+      };
+      const blockMap = {
+        "01_historia":    ["q011","q012","q013"],
+        "02_pessoa":      ["q021","q022","q023","q024","q025"],
+        "03_paciente":    ["q031","q032","q033","q034","q035","q036"],
+        "04_voz_tabu":    ["q041","q042","q043","q044"],
+        "05_casos_cenas": ["q051","q052","q053","q054"],
+        "06_visao":       ["q061","q062","q064"]
+      };
+
+      const notesIdx = {};
+      noteRows.forEach(r => { notesIdx[r.question_id] = r; });
+
+      const result = {
+        project: "La Vie en Rose · Estratégia — Posicionamento & Narrativa",
+        version: "1.0",
+        exportedAt: new Date().toISOString(),
+        flaggedQuestions: noteRows.filter(r => r.flagged).map(r => r.question_id),
+        tonPositivo: pillRows.filter(r => r.pill_group === "positive").map(r => r.pill_value),
+        tonNegativo: pillRows.filter(r => r.pill_group === "negative").map(r => r.pill_value),
+        blocks: {}
+      };
+
+      Object.entries(blockMap).forEach(([key, ids]) => {
+        result.blocks[key] = { title: blockTitles[key], answers: {} };
+        ids.forEach(qId => {
+          const row = notesIdx[qId];
+          if (row && row.content) {
+            result.blocks[key].answers[qId] = { text: row.content, flagged: !!row.flagged };
+          }
+        });
+      });
+
+      const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href = url;
+      a.download = `lvr-estrategia-anotacoes-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("Anotações exportadas");
+    } catch (e) {
+      console.warn("Export error:", e);
+      showToast("Erro ao exportar — tente novamente.");
+    }
+  }
+
+  async function resetNotes() {
+    if (!confirm("Apagar todas as anotações desta reunião? Não dá pra desfazer.")) return;
+    try {
+      await Promise.all([
+        sbDelete("lvr_estrategia_notes", "question_id=neq.null"),
+        sbDelete("lvr_estrategia_pills",  "pill_group=neq.null")
+      ]);
+      document.querySelectorAll("textarea[data-q]").forEach(t => t.value = "");
+      document.querySelectorAll(".question").forEach(q => q.classList.remove("flagged"));
+      document.querySelectorAll(".flag-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tone-pill").forEach(p => p.classList.remove("selected"));
+      showToast("Anotações apagadas");
+    } catch (e) {
+      console.warn("Reset error:", e);
+      showToast("Erro ao apagar — tente novamente.");
+    }
+  }
+
+  // ============================================================
+  // UI — SCROLL SPY
+  // ============================================================
   function updateCurrentBlock() {
-    const blocks = document.querySelectorAll(".interview-block");
+    const blocks   = document.querySelectorAll(".interview-block");
     const scrollPos = window.scrollY + window.innerHeight / 3;
-    let currentId = null;
-    blocks.forEach(b => {
-      if (b.offsetTop <= scrollPos) currentId = b.id;
-    });
+    let currentId  = null;
+    blocks.forEach(b => { if (b.offsetTop <= scrollPos) currentId = b.id; });
 
-    // Timeline cards
     document.querySelectorAll(".timeline-block").forEach(t => {
-      const href = t.getAttribute("href");
-      t.classList.toggle("current", href === "#" + currentId);
+      t.classList.toggle("current", t.getAttribute("href") === "#" + currentId);
     });
-
-    // Sidebar links
     document.querySelectorAll("#sidebarNav .sidebar-link").forEach(link => {
-      const href = link.getAttribute("href");
-      link.classList.toggle("active", href === "#" + currentId);
+      link.classList.toggle("active", link.getAttribute("href") === "#" + currentId);
     });
   }
 
@@ -1741,50 +1966,67 @@
     scrollTimeout = setTimeout(updateCurrentBlock, 100);
   });
 
-  // Sidebar toggle (mobile)
   document.getElementById("sidebarToggle").addEventListener("click", () => {
     document.body.classList.toggle("sidebar-open");
   });
-
-  // Fecha sidebar ao clicar em link (mobile)
   document.querySelectorAll("#sidebarNav .sidebar-link").forEach(link => {
     link.addEventListener("click", () => {
-      if (window.innerWidth <= 1000) {
-        document.body.classList.remove("sidebar-open");
-      }
+      if (window.innerWidth <= 1000) document.body.classList.remove("sidebar-open");
     });
   });
+
+  // ============================================================
+  // LOGIN
+  // ============================================================
+  const LOGIN_KEY       = "lvr_estrategia_auth_v1";
+  const CORRECT_PASSWORD = "Tud0V4idarC3rto*";
+
+  function checkAuth() {
+    return sessionStorage.getItem(LOGIN_KEY) === "true";
+  }
+
+  function initLogin() {
+    const gate  = document.getElementById("loginGate");
+    const input = document.getElementById("loginInput");
+    const btn   = document.getElementById("loginBtn");
+    const error = document.getElementById("loginError");
+
+    if (checkAuth()) {
+      gate.classList.add("hidden");
+      return;
+    }
+
+    document.body.classList.add("login-active");
+    setTimeout(() => input.focus(), 100);
+
+    function attempt() {
+      if (!input.value) { error.textContent = "Digite a senha."; input.focus(); return; }
+      btn.disabled = true;
+      error.textContent = "";
+      if (input.value === CORRECT_PASSWORD) {
+        sessionStorage.setItem(LOGIN_KEY, "true");
+        document.body.classList.remove("login-active");
+        gate.classList.add("hidden");
+        btn.disabled = false;
+      } else {
+        error.textContent = "Senha incorreta.";
+        input.value = "";
+        input.focus();
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener("click", attempt);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") attempt(); });
+  }
 
   // ============================================================
   // BOOT
   // ============================================================
-  // ============================================================
-  // TONE PILLS
-  // ============================================================
-  function loadPills() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_PILLS) || "{}"); }
-    catch { return {}; }
-  }
-  function savePills(pills) { localStorage.setItem(STORAGE_PILLS, JSON.stringify(pills)); }
-
-  function initPills() {
-    const saved = loadPills();
-    document.querySelectorAll(".tone-pill").forEach(pill => {
-      const key = pill.dataset.group + "__" + pill.dataset.value;
-      if (saved[key]) pill.classList.add("selected");
-      pill.addEventListener("click", () => {
-        pill.classList.toggle("selected");
-        const pills = loadPills();
-        pills[key] = pill.classList.contains("selected");
-        if (!pills[key]) delete pills[key];
-        savePills(pills);
-      });
-    });
-  }
-
-  function boot() {
+  async function boot() {
+    initLogin();
+    await restoreNotes();
     document.querySelectorAll("textarea[data-q]").forEach(attachNoteListener);
-    restoreNotes();
     initPills();
     updateCurrentBlock();
   }
