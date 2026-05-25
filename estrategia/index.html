@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>La Vie en Rose · Estratégia — Posicionamento &amp; Narrativa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #131e24;
+    --bg-deep: #0d1519;
+    --bg-card: #1f2f37;
+    --bg-card-hover: #2a3d47;
+    --gold: #c8975a;
+    --gold-bright: #d8a76a;
+    --gold-dim: rgba(200, 151, 90, 0.55);
+    --gold-line: rgba(200, 151, 90, 0.18);
+    --cream: #e8ddc8;
+    --cream-bright: #f0e6d2;
+    --text: #b8b5a8;
+    --text-soft: #8e8d80;
+    --text-muted: #5e6258;
+    --border: rgba(232, 221, 200, 0.08);
+    --border-soft: rgba(232, 221, 200, 0.04);
+
+    --font-display: "Lora", Georgia, serif;
+    --font-mono: "DM Mono", "SF Mono", Consolas, monospace;
+    --font-body: "Inter", -apple-system, sans-serif;
+
+    /* Liquid Glass tokens */
+    --glass-bg: rgba(31, 47, 55, 0.45);
+    --glass-bg-strong: rgba(31, 47, 55, 0.62);
+    --glass-bg-soft: rgba(31, 47, 55, 0.28);
+    --glass-border: rgba(232, 221, 200, 0.12);
+    --glass-border-bright: rgba(232, 221, 200, 0.22);
+    --glass-highlight: rgba(255, 255, 255, 0.06);
+    --glass-blur: 18px;
+    --glass-blur-strong: 24px;
+
+    /* Sidebar */
+    --sidebar-width: 280px;
+    --sidebar-margin: 14px;
+  }
+
+  /* Blob custom properties para animação suave */
+  @property --blob1-x { syntax: "<percentage>"; inherits: false; initial-value: 18%; }
+  @property --blob1-y { syntax: "<percentage>"; inherits: false; initial-value: 28%; }
+  @property --blob2-x { syntax: "<percentage>"; inherits: false; initial-value: 78%; }
+  @property --blob2-y { syntax: "<percentage>"; inherits: false; initial-value: 62%; }
+  @property --blob3-x { syntax: "<percentage>"; inherits: false; initial-value: 48%; }
+  @property --blob3-y { syntax: "<percentage>"; inherits: false; initial-value: 88%; }
+  @property --blob4-x { syntax: "<percentage>"; inherits: false; initial-value: 92%; }
+  @property --blob4-y { syntax: "<percentage>"; inherits: false; initial-value: 12%; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    overflow-x: hidden;
+    font-weight: 300;
+    letter-spacing: 0.005em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Camada -1: imagem tahoe-dusk.webp */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: url("./tahoe-dusk.webp") center / cover no-repeat;
+    pointer-events: none;
+  }
+
+  /* Camada 0: blobs de névoa animados */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 600px 400px at 80% 20%, rgba(200, 151, 90, 0.05), transparent 60%),
+      radial-gradient(ellipse 500px 300px at 15% 80%, rgba(70, 98, 112, 0.08), transparent 60%),
+      radial-gradient(ellipse 55% 40% at var(--blob1-x, 18%) var(--blob1-y, 28%), rgba(25, 38, 45, 0.55), rgba(25, 38, 45, 0.25) 45%, transparent 75%),
+      radial-gradient(ellipse 50% 50% at var(--blob2-x, 78%) var(--blob2-y, 62%), rgba(25, 38, 45, 0.5), rgba(25, 38, 45, 0.22) 45%, transparent 75%),
+      radial-gradient(ellipse 65% 35% at var(--blob3-x, 48%) var(--blob3-y, 88%), rgba(25, 38, 45, 0.45), rgba(25, 38, 45, 0.18) 50%, transparent 78%),
+      radial-gradient(ellipse 45% 55% at var(--blob4-x, 92%) var(--blob4-y, 12%), rgba(25, 38, 45, 0.42), rgba(25, 38, 45, 0.16) 50%, transparent 78%);
+    animation: fog-drift 45s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+
+  @keyframes fog-drift {
+    0%   { --blob1-x: 18%; --blob1-y: 28%; --blob2-x: 78%; --blob2-y: 62%; --blob3-x: 48%; --blob3-y: 88%; --blob4-x: 92%; --blob4-y: 12%; }
+    25%  { --blob1-x: 32%; --blob1-y: 42%; --blob2-x: 62%; --blob2-y: 52%; --blob3-x: 62%; --blob3-y: 78%; --blob4-x: 82%; --blob4-y: 22%; }
+    50%  { --blob1-x: 28%; --blob1-y: 58%; --blob2-x: 82%; --blob2-y: 38%; --blob3-x: 38%; --blob3-y: 82%; --blob4-x: 72%; --blob4-y: 28%; }
+    75%  { --blob1-x: 12%; --blob1-y: 48%; --blob2-x: 72%; --blob2-y: 72%; --blob3-x: 55%; --blob3-y: 92%; --blob4-x: 88%; --blob4-y: 18%; }
+    100% { --blob1-x: 24%; --blob1-y: 32%; --blob2-x: 76%; --blob2-y: 56%; --blob3-x: 50%; --blob3-y: 86%; --blob4-x: 94%; --blob4-y: 16%; }
+  }
+
+  @media (max-width: 768px) { body::before { animation-duration: 80s; } }
+  @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
+
+  main { position: relative; z-index: 3; }
+
+  /* Margem lateral para o sidebar */
+  body main {
+    margin-left: calc(var(--sidebar-width) + var(--sidebar-margin));
+  }
+  @media (max-width: 1000px) {
+    body main { margin-left: 0; }
+  }
+
+  /* ============ HERO ============ */
+  .hero {
+    min-height: 100vh;
+    padding: 3rem 5vw 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    color: var(--text-soft);
+    text-transform: uppercase;
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--cream);
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  .brand-mono {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    margin-right: 0.6rem;
+    letter-spacing: 0.2em;
+  }
+  .hero-recipient { text-align: right; line-height: 1.7; }
+  .hero-recipient .label { color: var(--text-muted); font-size: 0.7rem; }
+  .hero-recipient .name { color: var(--cream); font-size: 0.78rem; }
+  .hero-content { margin-top: auto; max-width: 1100px; }
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 2.2rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.2s forwards;
+  }
+  .hero-eyebrow::before { content: "•"; margin-right: 0.7rem; color: var(--gold); }
+  .hero-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(3rem, 7vw, 6.2rem);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 1.1s 0.45s forwards;
+  }
+  .hero-title em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .hero-sub {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    color: var(--text);
+    font-weight: 400;
+    max-width: 820px;
+    line-height: 1.5;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+  }
+  .hero-sub em { font-style: italic; color: var(--gold); }
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s 1s forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ SECTIONS ============ */
+  .section {
+    padding: 6rem 5vw;
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1.4rem;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .section-lead {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+    color: var(--text);
+    font-weight: 400;
+    max-width: 800px;
+    font-style: italic;
+    line-height: 1.55;
+    margin-bottom: 3rem;
+  }
+
+  /* ============ CONTRATO DE CONVERSA ============ */
+  .contract {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 2.4rem 2.6rem;
+    margin: 2rem 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 20px rgba(0,0,0,0.18);
+  }
+  .contract::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+    border-radius: 18px 0 0 18px;
+  }
+  .contract::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+    pointer-events: none;
+    border-radius: 18px 18px 0 0;
+  }
+  .contract-label {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .contract-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 1.2rem;
+  }
+  .contract-title em { font-style: italic; color: var(--gold); }
+  .contract-list { list-style: none; padding: 0; }
+  .contract-list li {
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.7;
+    padding-left: 1.7rem;
+    position: relative;
+    margin-bottom: 0.9rem;
+  }
+  .contract-list li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-family: var(--font-mono);
+  }
+  .contract-list li strong { color: var(--cream-bright); font-weight: 500; }
+
+  /* ============ TIMELINE OVERVIEW ============ */
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 3rem 0 0;
+  }
+  .timeline-block {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 1.4rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 20px rgba(0,0,0,0.18);
+  }
+  .timeline-block::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+    pointer-events: none;
+  }
+  .timeline-block:hover {
+    background: var(--glass-bg-strong);
+    border-color: var(--glass-border-bright);
+    transform: translateY(-2px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.28);
+  }
+  .timeline-block-num {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .timeline-block-name {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: 1.2rem;
+    font-style: italic;
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+  }
+  .timeline-block-time {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .timeline-block.current {
+    border-color: var(--gold);
+    background: rgba(200, 151, 90, 0.1);
+  }
+  .timeline-block.current::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: var(--gold);
+  }
+
+  /* ============ INTERVIEW BLOCK ============ */
+  .interview-block {
+    padding: 5rem 0;
+    border-top: 1px solid var(--border);
+    scroll-margin-top: 1rem;
+  }
+  .interview-block:first-of-type { border-top: none; }
+  .interview-block-header {
+    display: grid;
+    grid-template-columns: 220px 1fr auto;
+    gap: 2rem;
+    align-items: baseline;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gold-line);
+  }
+  .interview-block-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .interview-block-num {
+    font-family: var(--font-display);
+    color: var(--gold);
+    font-size: 3.5rem;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .interview-block-label {
+    font-family: var(--font-mono);
+    color: var(--text-soft);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .interview-block-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .interview-block-title em { font-style: italic; color: var(--gold); }
+  .interview-block-timer {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: right;
+    line-height: 1.4;
+  }
+  .interview-block-timer .time {
+    display: block;
+    font-family: var(--font-display);
+    color: var(--cream);
+    font-size: 1.6rem;
+    font-style: italic;
+    margin-bottom: 0.2rem;
+  }
+  .interview-block-intent {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--text);
+    font-size: 1.15rem;
+    line-height: 1.55;
+    margin-bottom: 2.8rem;
+    max-width: 820px;
+  }
+  .interview-block-intent em { color: var(--gold); font-style: normal; font-family: var(--font-body); font-size: 0.92em; }
+
+  /* ============ QUESTION ============ */
+  .question {
+    margin-bottom: 1.6rem;
+    padding: 1.6rem 1.8rem 1.6rem 2rem;
+    background: var(--glass-bg-soft);
+    backdrop-filter: blur(14px) saturate(135%);
+    -webkit-backdrop-filter: blur(14px) saturate(135%);
+    border: 1px solid var(--glass-border);
+    border-left: 2px solid transparent;
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 2px 12px rgba(0,0,0,0.12);
+    transition: border-color 0.3s, background 0.3s;
+    position: relative;
+  }
+  .question.flagged {
+    border-left-color: var(--gold);
+    background: rgba(200, 151, 90, 0.07);
+  }
+  .question-anchor {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+  .question.flagged .question-anchor::after { content: " · ★ marcada"; color: var(--gold); }
+  .question-main {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(1.4rem, 2vw, 1.75rem);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    margin-bottom: 1rem;
+  }
+  .question-main em { font-style: italic; color: var(--gold); }
+  .question-follow {
+    color: var(--text);
+    font-size: 0.98rem;
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+    max-width: 820px;
+  }
+  .question-follow ul { list-style: none; padding: 0; margin-top: 0.6rem; }
+  .question-follow li { padding-left: 1.4rem; position: relative; margin-bottom: 0.5rem; }
+  .question-follow li::before {
+    content: "›";
+    position: absolute;
+    left: 0;
+    color: var(--gold-dim);
+    font-family: var(--font-mono);
+  }
+  .question-aside {
+    background: rgba(13, 21, 25, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-left: 2px solid var(--gold-dim);
+    border-radius: 0 8px 8px 0;
+    padding: 0.9rem 1.2rem;
+    margin: 0.8rem 0 1.2rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    font-style: italic;
+    max-width: 820px;
+  }
+  .question-aside::before {
+    content: "Nota ao entrevistador · ";
+    color: var(--gold);
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+  }
+  .question-notes {
+    margin-top: 1.2rem;
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+  .question-notes textarea {
+    flex: 1;
+    background: rgba(13, 21, 25, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--cream);
+    padding: 0.8rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.93rem;
+    line-height: 1.55;
+    min-height: 70px;
+    resize: vertical;
+    transition: border 0.3s, background 0.3s;
+    font-weight: 300;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    outline: none;
+  }
+  .question-notes textarea:focus {
+    border-color: var(--gold-dim);
+    background: rgba(13, 21, 25, 0.7);
+  }
+  .question-notes textarea::placeholder { color: var(--text-muted); font-style: italic; }
+
+  .flag-btn {
+    background: rgba(31, 47, 55, 0.5);
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    color: var(--text-muted);
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .flag-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .flag-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(200, 151, 90, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 12px rgba(200,151,90,0.2);
+  }
+
+  /* ============ REFERENCE CHIPS ============ */
+  .ref-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0.8rem; }
+  .ref-chip {
+    background: rgba(13, 21, 25, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text-soft);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    padding: 0.45rem 0.9rem;
+    transition: all 0.25s;
+    cursor: default;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .ref-chip:hover { border-color: var(--gold-dim); color: var(--cream); }
+
+
+
+  /* ============ FECHAMENTO ============ */
+  .closing {
+    padding: 8rem 5vw 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  .closing-eyebrow {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+  .closing-title {
+    font-family: var(--font-display);
+    color: var(--cream-bright);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+  }
+  .closing-title em { font-style: italic; color: var(--gold); }
+  .closing-sub {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--text);
+    max-width: 740px;
+    margin: 0 auto 3rem;
+    line-height: 1.55;
+  }
+  .closing-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .closing-btn {
+    background: rgba(13, 21, 25, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--gold);
+    border-radius: 14px;
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .closing-btn:hover { background: rgba(200, 151, 90, 0.1); color: var(--cream-bright); }
+  .closing-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--gold-line);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* ============ TOAST ============ */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: rgba(13, 21, 25, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--gold);
+    border-radius: 14px;
+    color: var(--cream-bright);
+    padding: 0.9rem 1.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    z-index: 200;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ============================================================
+     SIDEBAR — ilha flutuante
+     ============================================================ */
+  .sidebar {
+    position: fixed;
+    top: var(--sidebar-margin);
+    left: var(--sidebar-margin);
+    bottom: var(--sidebar-margin);
+    width: calc(var(--sidebar-width) - var(--sidebar-margin));
+    background: rgba(13, 21, 25, 0.55);
+    backdrop-filter: blur(var(--glass-blur-strong)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(140%);
+    border: 1px solid var(--glass-border-bright);
+    border-radius: 20px;
+    z-index: 50;
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 12px 48px rgba(0, 0, 0, 0.4),
+      0 4px 16px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+  }
+
+  /* Reflexo de luz no topo */
+  .sidebar::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 30%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+    pointer-events: none;
+    border-radius: 20px 20px 0 0;
+    z-index: 1;
+  }
+
+  .sidebar-inner {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1.4rem 0 6rem;
+    direction: rtl;
+  }
+  .sidebar-inner > * { direction: ltr; }
+
+  /* Scrollbar invisível que aparece no hover */
+  .sidebar-inner::-webkit-scrollbar { width: 4px; }
+  .sidebar-inner::-webkit-scrollbar-track { background: transparent; }
+  .sidebar-inner::-webkit-scrollbar-thumb {
+    background: rgba(232, 221, 200, 0);
+    border-radius: 10px;
+    transition: background 0.3s;
+  }
+  .sidebar:hover .sidebar-inner::-webkit-scrollbar-thumb { background: rgba(232, 221, 200, 0.22); }
+  .sidebar-inner { scrollbar-width: thin; scrollbar-color: rgba(232, 221, 200, 0.12) transparent; }
+
+  /* Marca da sidebar */
+  .sidebar-brand {
+    padding: 0 1.4rem 1.4rem;
+    border-bottom: 1px solid var(--border-soft);
+    margin-bottom: 1rem;
+  }
+  .sidebar-brand-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+  }
+  .sidebar-brand-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--cream-bright);
+    line-height: 1.2;
+    font-weight: 500;
+  }
+  .sidebar-brand-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  /* Label de seção */
+  .sidebar-section-label {
+    padding: 0.6rem 1.4rem 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* Links de navegação */
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.6rem 1.4rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.82rem;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .sidebar-link:hover { background: rgba(31, 47, 55, 0.4); color: var(--cream-bright); }
+  .sidebar-link.active {
+    border-left-color: var(--gold);
+    background: rgba(31, 47, 55, 0.5);
+    color: var(--cream-bright);
+  }
+  .sidebar-link-num {
+    font-family: var(--font-mono);
+    color: var(--gold);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    width: 22px;
+  }
+  .sidebar-link-time {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* Botões de ação na sidebar */
+  .sidebar-actions {
+    padding: 1.2rem 1.4rem;
+    border-top: 1px solid var(--border-soft);
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .sidebar-action-btn {
+    background: rgba(13, 21, 25, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: left;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .sidebar-action-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .sidebar-action-btn.primary { border-color: var(--gold); color: var(--gold); background: rgba(200,151,90,0.06); }
+  .sidebar-action-btn.primary:hover { background: rgba(200,151,90,0.12); }
+
+  /* Hambúrguer (mobile) */
+  .sidebar-toggle {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 200;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(13, 21, 25, 0.7);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(232, 221, 200, 0.22);
+    color: var(--cream-bright);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease, left 0.3s ease;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1000px) {
+    .sidebar { transform: translateX(-110%); box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4); }
+    body.sidebar-open .sidebar { transform: translateX(0); }
+    body.sidebar-open .sidebar-toggle { transform: translateX(var(--sidebar-width)); }
+    .sidebar-toggle { display: flex; }
+  }
+  @media (max-width: 900px) {
+    .interview-block-header { grid-template-columns: 1fr; gap: 1rem; }
+    .interview-block-timer { text-align: left; }
+    .closing-meta { flex-direction: column; gap: 0.6rem; }
+  }
+
+  /* ============ PRINT ============ */
+  @media print {
+    body { background: white; color: black; }
+    body::before, body::after { display: none; }
+    .toast, .sidebar, .sidebar-toggle { display: none; }
+    body main { margin-left: 0 !important; }
+    .question-notes textarea {
+      background: white !important;
+      color: black !important;
+      border: 1px solid #ccc !important;
+      min-height: 60px;
+    }
+    .interview-block { page-break-inside: avoid; }
+    .contract, .timeline-block, .question {
+      background: white !important;
+      color: black !important;
+      border: 1px solid #ccc !important;
+      backdrop-filter: none !important;
+    }
+    .hero-title, .section-title, .interview-block-title, .question-main { color: #000 !important; }
+  }
+
+  /* ============ TON DE VOZ — PILLS SELECIONÁVEIS ============ */
+  .tone-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 1.2rem;
+  }
+  .tone-pill {
+    cursor: pointer;
+    padding: 0.52rem 1.05rem;
+    background: rgba(13, 21, 25, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .tone-pill:hover {
+    border-color: var(--gold-dim);
+    color: var(--cream);
+    background: rgba(13, 21, 25, 0.7);
+  }
+  .tone-pill.selected {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(200, 151, 90, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 12px rgba(200,151,90,0.15);
+  }
+
+  /* Fallback sem backdrop-filter */
+  @supports not (backdrop-filter: blur(1px)) {
+    .sidebar, .live-timer { background: rgba(13, 21, 25, 0.92) !important; }
+    .contract, .timeline-block, .question { background: rgba(31, 47, 55, 0.85) !important; }
+    .question-notes textarea, .ref-chip, .question-aside { background: rgba(13, 21, 25, 0.85) !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== SIDEBAR TOGGLE (mobile) ========== -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menu">☰</button>
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-inner">
+
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-eyebrow">LVR · Estratégia</div>
+      <div class="sidebar-brand-title">La Vie en Rose</div>
+      <div class="sidebar-brand-sub">Posicionamento &amp; Narrativa</div>
+    </div>
+
+    <div class="sidebar-section-label">— Roteiro —</div>
+    <nav id="sidebarNav">
+      <a class="sidebar-link" href="#bloco-01">
+        <span class="sidebar-link-num">01</span>
+        A história
+        <span class="sidebar-link-time">10 min</span>
+      </a>
+      <a class="sidebar-link" href="#bloco-02">
+        <span class="sidebar-link-num">02</span>
+        A pessoa
+        <span class="sidebar-link-time">10 min</span>
+      </a>
+      <a class="sidebar-link" href="#bloco-03">
+        <span class="sidebar-link-num">03</span>
+        O paciente
+        <span class="sidebar-link-time">12 min</span>
+      </a>
+      <a class="sidebar-link" href="#bloco-04">
+        <span class="sidebar-link-num">04</span>
+        Voz &amp; tabu
+        <span class="sidebar-link-time">10 min</span>
+      </a>
+      <a class="sidebar-link" href="#bloco-05">
+        <span class="sidebar-link-num">05</span>
+        Casos &amp; cenas
+        <span class="sidebar-link-time">8 min</span>
+      </a>
+      <a class="sidebar-link" href="#bloco-06">
+        <span class="sidebar-link-num">06</span>
+        Visão
+        <span class="sidebar-link-time">7 min</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-actions">
+      <button class="sidebar-action-btn primary" onclick="exportNotes()">Exportar anotações</button>
+      <button class="sidebar-action-btn" onclick="resetNotes()">Apagar anotações</button>
+      <button class="sidebar-action-btn" onclick="window.print()">Imprimir / PDF</button>
+    </div>
+
+  </div>
+</aside>
+
+<main>
+
+  <!-- ============================================================ -->
+  <!-- ============== HERO ======================================== -->
+  <!-- ============================================================ -->
+  <section class="hero">
+    <div class="hero-top">
+      <div class="brand"><span class="brand-mono">LVR</span>La Vie en Rose · Clínica de Saúde Mental</div>
+      <div class="hero-recipient">
+        <div class="label">— Conversa com —</div>
+        <div class="name">Dr. Bruno Benites de Castro</div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">Estratégia · Posicionamento &amp; Narrativa</div>
+      <h1 class="hero-title">A matéria-prima<br/>da <em>marca</em>.</h1>
+      <p class="hero-sub">Esta não é uma entrevista. <em>É uma conversa.</em> Sessenta minutos para extrair o que está em você — a história, a voz, os limites — e ainda não esteve em planilha nenhuma. É daqui que nasce tudo o que vamos construir nos próximos sessenta dias.</p>
+    </div>
+
+    <div class="hero-bottom">
+      <div>Reunião ao vivo · 60 minutos</div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- ============== TIMELINE OVERVIEW =========================== -->
+  <!-- ============================================================ -->
+  <section class="section">
+    <div class="section-header">— Roteiro de 60 minutos —</div>
+    <h2 class="section-title">Os <em>seis blocos</em>.</h2>
+    <p class="section-lead">Cada bloco tem um tempo sugerido. Clique em qualquer um para pular direto para a seção correspondente — útil se a conversa tomar um rumo diferente e precisarmos navegar.</p>
+
+    <div class="timeline">
+      <a href="#bloco-01" class="timeline-block">
+        <div class="timeline-block-num">01</div>
+        <div class="timeline-block-name">A história</div>
+        <div class="timeline-block-time">10 min · origens</div>
+      </a>
+      <a href="#bloco-02" class="timeline-block">
+        <div class="timeline-block-num">02</div>
+        <div class="timeline-block-name">A pessoa</div>
+        <div class="timeline-block-time">10 min · o Bruno</div>
+      </a>
+      <a href="#bloco-03" class="timeline-block">
+        <div class="timeline-block-num">03</div>
+        <div class="timeline-block-name">O paciente</div>
+        <div class="timeline-block-time">12 min · persona</div>
+      </a>
+      <a href="#bloco-04" class="timeline-block">
+        <div class="timeline-block-num">04</div>
+        <div class="timeline-block-name">Voz &amp; tabu</div>
+        <div class="timeline-block-time">10 min · tom</div>
+      </a>
+      <a href="#bloco-05" class="timeline-block">
+        <div class="timeline-block-num">05</div>
+        <div class="timeline-block-name">Casos &amp; cenas</div>
+        <div class="timeline-block-time">8 min · material</div>
+      </a>
+      <a href="#bloco-06" class="timeline-block">
+        <div class="timeline-block-num">06</div>
+        <div class="timeline-block-name">Visão</div>
+        <div class="timeline-block-time">7 min · futuro</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- ============== BLOCOS DE ENTREVISTA ======================== -->
+  <!-- ============================================================ -->
+  <section class="section">
+
+    <!-- ============== BLOCO 01 — A HISTÓRIA ===================== -->
+    <div class="interview-block" id="bloco-01">
+      <div class="interview-block-header">
+        <div class="interview-block-marker">
+          <span class="interview-block-num">01</span>
+          <span class="interview-block-label">A história</span>
+        </div>
+        <h3 class="interview-block-title">A <em>origem</em>.</h3>
+        <div class="interview-block-timer">
+          <span class="time">10 min</span>
+          <span>cenas fundadoras</span>
+        </div>
+      </div>
+      <p class="interview-block-intent">Toda marca começa com uma história — e quase nenhuma sabe contar a sua. Aqui vamos extrair as cenas fundadoras, o porquê do nome, o momento de inflexão. <em>Material para o "Sobre a clínica" do site, para o post de aniversário, para o vídeo institucional.</em></p>
+
+      <div class="question">
+        <span class="question-anchor">01.1</span>
+        <h4 class="question-main">Como nasceu La Vie en Rose? E por que <em>esse</em> nome?</h4>
+        <div class="question-follow">
+          Conte a cena. O dia em que você decidiu. Onde você estava, o que estava acontecendo na sua vida, o que faltava no mercado que te incomodava.
+          <ul>
+            <li>"La Vie en Rose" — é referência à Edith Piaf? A algo familiar? A algo simbólico?</li>
+            <li>Houve um momento em que você considerou outro nome?</li>
+          </ul>
+        </div>
+        <div class="question-aside">Se o nome veio de outra pessoa (sócio, familiar), peça que ele conte a história da escolha, não apenas o significado. Cenas geram conteúdo, definições não.</div>
+        <div class="question-notes">
+          <textarea data-q="q011" placeholder="Anotações ao vivo — palavras-chave, frases exatas, expressões que vale capturar..."></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)" title="Marcar para revisar depois">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">01.2</span>
+        <h4 class="question-main">Em uma frase: o que <em>essa</em> clínica é, que nenhuma outra é?</h4>
+        <div class="question-follow">
+          Não é o slogan oficial — é o que você diria para alguém que perguntasse em um almoço.
+        </div>
+        <div class="question-aside">Se ele começar a listar diferenciais (psiquiatria intervencionista, Slow Medicine, multidisciplinar), insista: "tudo isso junto, em uma frase, o que faz?" — é onde a essência aparece.</div>
+        <div class="question-notes">
+          <textarea data-q="q012" placeholder="A frase exata, como ele falou. Não parafraseie no momento — copie."></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">01.3</span>
+        <h4 class="question-main">Se a clínica fechasse amanhã, o que o mundo <em>perderia</em> que não voltaria a ter facilmente?</h4>
+        <div class="question-follow">
+          Pergunta difícil de propósito. Não é sobre orgulho — é sobre escassez. O que existe na La Vie en Rose que é raro, mesmo no Brasil inteiro?
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q013" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- ============== BLOCO 02 — A PESSOA ======================= -->
+    <div class="interview-block" id="bloco-02">
+      <div class="interview-block-header">
+        <div class="interview-block-marker">
+          <span class="interview-block-num">02</span>
+          <span class="interview-block-label">A pessoa</span>
+        </div>
+        <h3 class="interview-block-title">O Bruno <em>por trás</em> do CRM.</h3>
+        <div class="interview-block-timer">
+          <span class="time">10 min</span>
+          <span>persona do médico</span>
+        </div>
+      </div>
+      <p class="interview-block-intent">Pessoas seguem pessoas, não logos — está literalmente no painel operacional. Aqui extraímos o material que vai alimentar o perfil pessoal do Dr. Bruno no Instagram: as referências, as fragilidades, as opiniões fortes. <em>É o que separa um perfil médico autêntico de mais um @drfulano padronizado.</em></p>
+
+      <div class="question">
+        <span class="question-anchor">02.1</span>
+        <h4 class="question-main">Por que <em>psiquiatria</em> — especificamente?</h4>
+        <div class="question-follow">
+          Você poderia ter ido para cardiologia, ortopedia, qualquer coisa. O que te puxou pra cá? Houve uma pessoa, uma cena, uma leitura, uma experiência pessoal?
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q021" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">02.2</span>
+        <h4 class="question-main">O que você <em>lê, ouve, assiste</em> — fora do trabalho?</h4>
+        <div class="question-follow">
+          Livro atual, podcast recorrente, série marcante, autor que você sempre volta. Esse mapa cultural é decisivo para o tom de voz da marca.
+          <ul>
+            <li>Há algum autor brasileiro contemporâneo que te marca?</li>
+            <li>Música que toca enquanto você atende ou estuda?</li>
+            <li>O que você está consumindo agora que ninguém esperaria de um psiquiatra?</li>
+          </ul>
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q022" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">02.3</span>
+        <h4 class="question-main">Há algo sobre saúde mental em que você acredita <em>e</em> a maioria dos psiquiatras discordaria?</h4>
+        <div class="question-follow">
+          Posição forte, ainda que controversa. É exatamente esse tipo de discurso que gera o conteúdo "ensinamento / tapa na cara" descrito nos pilares do painel — e que gera compartilhamento.
+        </div>
+        <div class="question-aside">Se ele resistir ("não é confortável falar isso"), pergunte: "e se você só falasse isso entre colegas?". A pergunta é para saber a posição — depois ele decide se quer torná-la pública.</div>
+        <div class="question-notes">
+          <textarea data-q="q023" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">02.4</span>
+        <h4 class="question-main">Quem é o <em>mentor vivo</em> que mais te formou?</h4>
+        <div class="question-follow">
+          Pessoa real, viva, possivelmente conhecida — ou totalmente anônima. Por que essa pessoa? Que frase dela você ainda repete?
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q024" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">02.5</span>
+        <h4 class="question-main">O que te dá <em>tesão profissional</em>?</h4>
+        <div class="question-follow">
+          No sentido amplo da palavra — o que te faz acordar com vontade de trabalhar? Que tipo de caso, que tipo de paciente, que tipo de problema? E o oposto: o que te esvazia?
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q025" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== BLOCO 03 — O PACIENTE ===================== -->
+    <div class="interview-block" id="bloco-03">
+      <div class="interview-block-header">
+        <div class="interview-block-marker">
+          <span class="interview-block-num">03</span>
+          <span class="interview-block-label">O paciente</span>
+        </div>
+        <h3 class="interview-block-title">A paciente <em>em silêncio</em>.</h3>
+        <div class="interview-block-timer">
+          <span class="time">12 min</span>
+          <span>persona</span>
+        </div>
+      </div>
+      <p class="interview-block-intent">Persona não é avatar fofo de PowerPoint — está literalmente escrito no painel. É a régua que define o que a clínica fala, ignora, e o tom de cada conteúdo. <em>Esta seção é a mais densa da reunião porque alimenta diretamente o quiz, a copy do site, os roteiros de Reels e os anúncios pagos.</em></p>
+
+      <div class="question">
+        <span class="question-anchor">03.1</span>
+        <h4 class="question-main">Descreva o paciente que você <em>mais consegue ajudar</em> — não o que mais aparece.</h4>
+        <div class="question-follow">
+          Há diferença. O paciente que mais agenda nem sempre é o mesmo que mais se beneficia da forma como você atende. Quem é o que você é melhor para tratar?
+          <ul>
+            <li>Idade aproximada, momento de vida, profissão típica</li>
+            <li>Quadro clínico mais frequente nesse perfil</li>
+            <li>O que o trouxe até você (canal, pessoa que indicou)</li>
+          </ul>
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q031" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">03.2</span>
+        <h4 class="question-main">Que <em>vocabulário</em> esse paciente usa para descrever a própria dor?</h4>
+        <div class="question-follow">
+          Palavras exatas. Não "ansiedade" — o que ele <em style="color:var(--cream-bright); font-style:normal">diz</em>. "Não consigo dormir, fico revirando", "sinto um aperto no peito", "minha cabeça não para", "não sei o que é cansaço normal e o que é depressão"...
+        </div>
+        <div class="question-aside">Anote as palavras literais — elas viram títulos de post, perguntas de quiz, gatilho de anúncio. Vocabulário do paciente é mais valioso que vocabulário do médico.</div>
+        <div class="question-notes">
+          <textarea data-q="q032" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">03.3</span>
+        <h4 class="question-main">O que ele <em>pesquisou no Google</em> antes de chegar até você?</h4>
+        <div class="question-follow">
+          Termos exatos da busca, mesmo que pareçam ingênuos. Isso é insumo direto para o mapa de palavras-chave da Fase 02 do painel.
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q033" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">03.4</span>
+        <h4 class="question-main">Do que ele tinha <em>medo de descobrir</em>? E do que se aliviou ao descobrir?</h4>
+        <div class="question-follow">
+          Por exemplo: tinha medo de descobrir que era "preguiçoso" — se aliviou ao descobrir que era TDAH. Essa fórmula <em style="color:var(--cream-bright); font-style:normal">medo → alívio</em> é o motor da autoidentificação descrita nos pilares editoriais.
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q034" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">03.5</span>
+        <h4 class="question-main">O que ele pensava de <em>psiquiatra</em> antes de te conhecer?</h4>
+        <div class="question-follow">
+          Sobre psiquiatria como especialidade. Sobre medicação. Sobre "ir ao psiquiatra". Quais são os pré-conceitos que ele carregava — e que você precisa desfazer no primeiro contato?
+        </div>
+        <div class="question-aside">Conecta diretamente com o pilar "quebrando mitos" do feed.</div>
+        <div class="question-notes">
+          <textarea data-q="q035" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">03.6</span>
+        <h4 class="question-main">Como ele <em>te recomenda</em> para um amigo? Em uma frase.</h4>
+        <div class="question-follow">
+          A frase espontânea, no almoço, no WhatsApp, quando alguém pergunta "você tem um psiquiatra bom para indicar?". Essa frase é praticamente o slogan que vocês deveriam usar.
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q036" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== BLOCO 04 — VOZ &amp; TABU ================= -->
+    <div class="interview-block" id="bloco-04">
+      <div class="interview-block-header">
+        <div class="interview-block-marker">
+          <span class="interview-block-num">04</span>
+          <span class="interview-block-label">Voz &amp; tabu</span>
+        </div>
+        <h3 class="interview-block-title">O <em>tom</em> e os limites.</h3>
+        <div class="interview-block-timer">
+          <span class="time">10 min</span>
+          <span>como falar / como não falar</span>
+        </div>
+      </div>
+      <p class="interview-block-intent">Já mapeamos referências no doc de Referências do Drive: Italo Marsili, Eslen Delanogare, Jean Alessandro, Vittoria Segatta, Ramiro Catelan, Thaís Prioli, entre outros. Aqui vamos refinar — qual mais te representa, qual você não quer parecer, e onde estão os limites éticos pessoais que vão além do CFM. <em>O resultado é o manual de tom de voz da clínica.</em></p>
+
+      <div class="question">
+        <span class="question-anchor">04.1</span>
+        <h4 class="question-main">Qual o <em>tom de voz</em> que você espera que a sua marca tenha?</h4>
+        <div class="question-follow">
+          Selecione todas as características que ressoam com a identidade que você imagina para a La Vie en Rose.
+        </div>
+        <div class="tone-pills" id="tone-positive">
+          <span class="tone-pill" data-group="positive" data-value="Acolhedor">Acolhedor</span>
+          <span class="tone-pill" data-group="positive" data-value="Animado">Animado</span>
+          <span class="tone-pill" data-group="positive" data-value="Científico">Científico</span>
+          <span class="tone-pill" data-group="positive" data-value="Clínico">Clínico</span>
+          <span class="tone-pill" data-group="positive" data-value="Direto">Direto</span>
+          <span class="tone-pill" data-group="positive" data-value="Educativo">Educativo</span>
+          <span class="tone-pill" data-group="positive" data-value="Empático">Empático</span>
+          <span class="tone-pill" data-group="positive" data-value="Encorajador">Encorajador</span>
+          <span class="tone-pill" data-group="positive" data-value="Humano">Humano</span>
+          <span class="tone-pill" data-group="positive" data-value="Informal">Informal</span>
+          <span class="tone-pill" data-group="positive" data-value="Inspirador">Inspirador</span>
+          <span class="tone-pill" data-group="positive" data-value="Intelectual">Intelectual</span>
+          <span class="tone-pill" data-group="positive" data-value="Minimalista">Minimalista</span>
+          <span class="tone-pill" data-group="positive" data-value="Poético">Poético</span>
+          <span class="tone-pill" data-group="positive" data-value="Profissional">Profissional</span>
+          <span class="tone-pill" data-group="positive" data-value="Provocador">Provocador</span>
+          <span class="tone-pill" data-group="positive" data-value="Reflexivo">Reflexivo</span>
+          <span class="tone-pill" data-group="positive" data-value="Sério">Sério</span>
+          <span class="tone-pill" data-group="positive" data-value="Sofisticado">Sofisticado</span>
+          <span class="tone-pill" data-group="positive" data-value="Técnico">Técnico</span>
+          <span class="tone-pill" data-group="positive" data-value="Transparente">Transparente</span>
+          <span class="tone-pill" data-group="positive" data-value="Vibrante">Vibrante</span>
+        </div>
+        <div class="question-notes" style="margin-top:1.2rem;">
+          <textarea data-q="q041" placeholder="Observações sobre o tom de voz desejado..."></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">04.2</span>
+        <h4 class="question-main">Quais características você <em>não quer</em> que o tom de voz da sua marca tenha?</h4>
+        <div class="question-follow">
+          Definir o "não" é tão importante quanto o "sim" — é o que evita que a comunicação escorregue para territórios que não representam a clínica.
+        </div>
+        <div class="tone-pills" id="tone-negative">
+          <span class="tone-pill" data-group="negative" data-value="Acolhedor">Acolhedor</span>
+          <span class="tone-pill" data-group="negative" data-value="Animado">Animado</span>
+          <span class="tone-pill" data-group="negative" data-value="Científico">Científico</span>
+          <span class="tone-pill" data-group="negative" data-value="Clínico">Clínico</span>
+          <span class="tone-pill" data-group="negative" data-value="Direto">Direto</span>
+          <span class="tone-pill" data-group="negative" data-value="Educativo">Educativo</span>
+          <span class="tone-pill" data-group="negative" data-value="Empático">Empático</span>
+          <span class="tone-pill" data-group="negative" data-value="Encorajador">Encorajador</span>
+          <span class="tone-pill" data-group="negative" data-value="Humano">Humano</span>
+          <span class="tone-pill" data-group="negative" data-value="Informal">Informal</span>
+          <span class="tone-pill" data-group="negative" data-value="Inspirador">Inspirador</span>
+          <span class="tone-pill" data-group="negative" data-value="Intelectual">Intelectual</span>
+          <span class="tone-pill" data-group="negative" data-value="Minimalista">Minimalista</span>
+          <span class="tone-pill" data-group="negative" data-value="Poético">Poético</span>
+          <span class="tone-pill" data-group="negative" data-value="Profissional">Profissional</span>
+          <span class="tone-pill" data-group="negative" data-value="Provocador">Provocador</span>
+          <span class="tone-pill" data-group="negative" data-value="Reflexivo">Reflexivo</span>
+          <span class="tone-pill" data-group="negative" data-value="Sério">Sério</span>
+          <span class="tone-pill" data-group="negative" data-value="Sofisticado">Sofisticado</span>
+          <span class="tone-pill" data-group="negative" data-value="Técnico">Técnico</span>
+          <span class="tone-pill" data-group="negative" data-value="Transparente">Transparente</span>
+          <span class="tone-pill" data-group="negative" data-value="Vibrante">Vibrante</span>
+        </div>
+        <div class="question-notes" style="margin-top:1.2rem;">
+          <textarea data-q="q042" placeholder="Observações sobre o que evitar no tom de voz..."></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">04.3</span>
+        <h4 class="question-main">Que tipo de conteúdo você se recusa <em>terminantemente</em> a fazer?</h4>
+        <div class="question-follow">
+          Cite formatos específicos: trends de dança, antes-e-depois (já é proibido pelo CFM, mas mesmo nas brechas), conteúdo religioso, conteúdo político partidário, conteúdo sobre alimentação, conteúdo sobre relacionamentos amorosos...
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q043" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">04.4</span>
+        <h4 class="question-main">Há posições <em>políticas, religiosas ou ideológicas</em> que você quer manter públicas? E privadas?</h4>
+        <div class="question-follow">
+          Não há resposta certa. Alguns médicos se beneficiam de se posicionarem (Italo Marsili é exemplo claro). Outros perdem audiência. O importante é uma decisão consciente, não um deslize.
+        </div>
+        <div class="question-aside">Aqui vale ouvir mais que perguntar. Se ele hesitar, deixe o silêncio trabalhar.</div>
+        <div class="question-notes">
+          <textarea data-q="q044" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- ============== BLOCO 05 — CASOS &amp; CENAS ============== -->
+    <div class="interview-block" id="bloco-05">
+      <div class="interview-block-header">
+        <div class="interview-block-marker">
+          <span class="interview-block-num">05</span>
+          <span class="interview-block-label">Casos &amp; cenas</span>
+        </div>
+        <h3 class="interview-block-title">A <em>matéria-prima</em> do consultório.</h3>
+        <div class="interview-block-timer">
+          <span class="time">8 min</span>
+          <span>material narrativo</span>
+        </div>
+      </div>
+      <p class="interview-block-intent">Tudo aqui é tratado com sigilo absoluto e nada vira material público sem anonimização e sem revisão sua. Mas precisamos da matéria-prima — porque as histórias do consultório são <em>o</em> ativo narrativo de uma clínica de psiquiatria. Roteiros de Reels, posts de autoidentificação, cenas de stories — todos nascem aqui.</p>
+
+      <div class="question">
+        <span class="question-anchor">05.1</span>
+        <h4 class="question-main">Conte uma <em>cena</em> de consultório que te marcou.</h4>
+        <div class="question-follow">
+          Sem nome, sem dado identificável. Mas com a cena viva — o gesto, a frase, o olhar.
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q051" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">05.2</span>
+        <h4 class="question-main">Há uma <em>frase de paciente</em> que você nunca esqueceu?</h4>
+        <div class="question-follow">
+          Literal, como ele disse. Por que ela ficou? O que ela revelou?
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q052" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">05.3</span>
+        <h4 class="question-main">Há um caso clínico que <em>mudou</em> sua forma de praticar psiquiatria?</h4>
+        <div class="question-follow">
+          Um divisor de águas. Antes daquele caso você fazia de um jeito. Depois, de outro.
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q053" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">05.4</span>
+        <h4 class="question-main">Em <em>quais histórias</em> você se autoriza a aparecer publicamente? Em quais não?</h4>
+        <div class="question-follow">
+          Estabelecer essa linha agora poupa toda uma negociação caso a caso depois. Por exemplo: histórias de Cetamina, sim. Histórias de pacientes em ideação suicida, jamais. Pacientes famosos, depende.
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q054" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== BLOCO 06 — VISÃO ========================== -->
+    <div class="interview-block" id="bloco-06">
+      <div class="interview-block-header">
+        <div class="interview-block-marker">
+          <span class="interview-block-num">06</span>
+          <span class="interview-block-label">Visão</span>
+        </div>
+        <h3 class="interview-block-title">O <em>legado</em> que você quer deixar.</h3>
+        <div class="interview-block-timer">
+          <span class="time">7 min</span>
+          <span>direção</span>
+        </div>
+      </div>
+      <p class="interview-block-intent">Para fechar — onde você quer estar daqui a três anos, e qual o pedaço maior que essa marca está construindo. <em>Sem essa direção, qualquer estratégia vira tática solta.</em></p>
+
+      <div class="question">
+        <span class="question-anchor">06.1</span>
+        <h4 class="question-main">Daqui a <em>três anos</em>, o que vai existir na La Vie en Rose que hoje não existe?</h4>
+        <div class="question-follow">
+          Concreto, não inspiracional. Novos serviços? Nova sede? Mais profissionais? Linha de produtos digitais? Programa de formação? Pesquisa publicada?
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q061" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <span class="question-anchor">06.2</span>
+        <h4 class="question-main">Se pudesse atender <em>só 10 pacientes</em> por mês pelo resto da vida — quais 10 perfis você escolheria?</h4>
+        <div class="question-follow">
+          Pergunta-teste de posicionamento. Define com clareza o foco que talvez você mesmo ainda não tenha verbalizado.
+        </div>
+        <div class="question-notes">
+          <textarea data-q="q062" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+
+
+
+      <div class="question">
+        <span class="question-anchor">06.4</span>
+        <h4 class="question-main">Há algo que você sonha <em>publicar, construir ou fundar</em> e ainda não tirou do papel?</h4>
+        <div class="question-follow">
+          Livro, curso para outros médicos, instituto, ONG, podcast, residência multidisciplinar, formação. Mesmo que pareça distante.
+        </div>
+        <div class="question-aside">Conteúdo para o pilar "meta documentada" no Instagram — exatamente como descrito na régua de pessoalidade do painel.</div>
+        <div class="question-notes">
+          <textarea data-q="q064" placeholder=""></textarea>
+          <button class="flag-btn" onclick="toggleFlag(this)">★</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- ============== FECHAMENTO ================================== -->
+  <!-- ============================================================ -->
+  <section class="closing">
+    <div class="closing-eyebrow">— Próximos passos —</div>
+    <h2 class="closing-title">Tudo o que <em>vem agora</em><br/>nasce daqui.</h2>
+    <p class="closing-sub">Nos próximos sete dias entregamos a você um <em>Documento de Insights</em> com 20 a 30 páginas: persona consolidada, tom de voz codificado, mapa competitivo e recomendações estratégicas. É o entregável que abre oficialmente a Fase 01 do plano — e que sustenta tudo o que vamos construir.</p>
+
+    <div class="closing-actions">
+      <button class="closing-btn" onclick="exportNotes()">Exportar anotações</button>
+      <button class="closing-btn" onclick="window.print()">Imprimir / salvar PDF</button>
+    </div>
+
+    <div class="closing-meta">
+      <div>LVR · La Vie en Rose</div>
+      <div>Estratégia · v1.0</div>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STORAGE_NOTES = "lvr_briefing_02_notes_v1";
+  const STORAGE_FLAGS = "lvr_briefing_02_flags_v1";
+  const STORAGE_PILLS = "lvr_estrategia_pills_v1";
+
+  // ============================================================
+  // NOTES PERSISTENCE
+  // ============================================================
+  function loadNotes() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_NOTES) || "{}"); }
+    catch { return {}; }
+  }
+  function saveNotes(notes) { localStorage.setItem(STORAGE_NOTES, JSON.stringify(notes)); }
+  function loadFlags() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_FLAGS) || "{}"); }
+    catch { return {}; }
+  }
+  function saveFlags(flags) { localStorage.setItem(STORAGE_FLAGS, JSON.stringify(flags)); }
+
+  function attachNoteListener(textarea) {
+    const id = textarea.dataset.q;
+    textarea.addEventListener("input", () => {
+      const notes = loadNotes();
+      notes[id] = textarea.value;
+      saveNotes(notes);
+    });
+  }
+
+  function toggleFlag(btn) {
+    const question = btn.closest(".question");
+    const textarea = question.querySelector("textarea[data-q]");
+    const id = textarea.dataset.q;
+    const flags = loadFlags();
+    const isFlagged = !flags[id];
+    flags[id] = isFlagged;
+    saveFlags(flags);
+    btn.classList.toggle("active", isFlagged);
+    question.classList.toggle("flagged", isFlagged);
+  }
+
+  function restoreNotes() {
+    const notes = loadNotes();
+    const flags = loadFlags();
+    document.querySelectorAll("textarea[data-q]").forEach(t => {
+      const id = t.dataset.q;
+      if (notes[id]) t.value = notes[id];
+      if (flags[id]) {
+        const question = t.closest(".question");
+        const flagBtn = question.querySelector(".flag-btn");
+        question.classList.add("flagged");
+        if (flagBtn) flagBtn.classList.add("active");
+      }
+    });
+  }
+
+  // ============================================================
+  // EXPORT
+  // ============================================================
+  function exportNotes() {
+    const notes = loadNotes();
+    const flags = loadFlags();
+    const blocks = {
+      "01_historia": ["q011", "q012", "q013", "q014"],
+      "02_pessoa": ["q021", "q022", "q023", "q024", "q025"],
+      "03_paciente": ["q031", "q032", "q033", "q034", "q035", "q036"],
+      "04_voz_tabu": ["q041", "q042", "q043", "q044", "q045"],
+      "05_casos_cenas": ["q051", "q052", "q053", "q054"],
+      "06_visao": ["q061", "q062", "q063", "q064"]
+    };
+    const blockTitles = {
+      "01_historia": "Bloco 01 — A história",
+      "02_pessoa": "Bloco 02 — A pessoa",
+      "03_paciente": "Bloco 03 — O paciente",
+      "04_voz_tabu": "Bloco 04 — Voz e tabu",
+      "05_casos_cenas": "Bloco 05 — Casos e cenas",
+      "06_visao": "Bloco 06 — Visão"
+    };
+    const result = {
+      project: "La Vie en Rose · Estratégia — Posicionamento & Narrativa",
+      version: "1.0",
+      exportedAt: new Date().toISOString(),
+      flaggedQuestions: Object.keys(flags).filter(k => flags[k]),
+      blocks: {}
+    };
+    Object.entries(blocks).forEach(([key, qIds]) => {
+      result.blocks[key] = { title: blockTitles[key], answers: {} };
+      qIds.forEach(qId => {
+        if (notes[qId]) {
+          result.blocks[key].answers[qId] = { text: notes[qId], flagged: !!flags[qId] };
+        }
+      });
+    });
+    const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `lvr-briefing-02-anotacoes-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Anotações exportadas");
+  }
+
+  function resetNotes() {
+    if (!confirm("Apagar todas as anotações desta reunião? Não dá pra desfazer.")) return;
+    localStorage.removeItem(STORAGE_NOTES);
+    localStorage.removeItem(STORAGE_FLAGS);
+    document.querySelectorAll("textarea[data-q]").forEach(t => t.value = "");
+    document.querySelectorAll(".question").forEach(q => q.classList.remove("flagged"));
+    document.querySelectorAll(".flag-btn").forEach(b => b.classList.remove("active"));
+    showToast("Anotações apagadas");
+  }
+
+  // ============================================================
+  // UI
+  // ============================================================  const toastEl = document.getElementById("toast");
+  let toastTimer;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3000);
+  }
+
+  // Scroll spy — atualiza timeline cards E links da sidebar
+  function updateCurrentBlock() {
+    const blocks = document.querySelectorAll(".interview-block");
+    const scrollPos = window.scrollY + window.innerHeight / 3;
+    let currentId = null;
+    blocks.forEach(b => {
+      if (b.offsetTop <= scrollPos) currentId = b.id;
+    });
+
+    // Timeline cards
+    document.querySelectorAll(".timeline-block").forEach(t => {
+      const href = t.getAttribute("href");
+      t.classList.toggle("current", href === "#" + currentId);
+    });
+
+    // Sidebar links
+    document.querySelectorAll("#sidebarNav .sidebar-link").forEach(link => {
+      const href = link.getAttribute("href");
+      link.classList.toggle("active", href === "#" + currentId);
+    });
+  }
+
+  let scrollTimeout;
+  window.addEventListener("scroll", () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(updateCurrentBlock, 100);
+  });
+
+  // Sidebar toggle (mobile)
+  document.getElementById("sidebarToggle").addEventListener("click", () => {
+    document.body.classList.toggle("sidebar-open");
+  });
+
+  // Fecha sidebar ao clicar em link (mobile)
+  document.querySelectorAll("#sidebarNav .sidebar-link").forEach(link => {
+    link.addEventListener("click", () => {
+      if (window.innerWidth <= 1000) {
+        document.body.classList.remove("sidebar-open");
+      }
+    });
+  });
+
+  // ============================================================
+  // BOOT
+  // ============================================================
+  // ============================================================
+  // TONE PILLS
+  // ============================================================
+  function loadPills() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_PILLS) || "{}"); }
+    catch { return {}; }
+  }
+  function savePills(pills) { localStorage.setItem(STORAGE_PILLS, JSON.stringify(pills)); }
+
+  function initPills() {
+    const saved = loadPills();
+    document.querySelectorAll(".tone-pill").forEach(pill => {
+      const key = pill.dataset.group + "__" + pill.dataset.value;
+      if (saved[key]) pill.classList.add("selected");
+      pill.addEventListener("click", () => {
+        pill.classList.toggle("selected");
+        const pills = loadPills();
+        pills[key] = pill.classList.contains("selected");
+        if (!pills[key]) delete pills[key];
+        savePills(pills);
+      });
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll("textarea[data-q]").forEach(attachNoteListener);
+    restoreNotes();
+    initPills();
+    updateCurrentBlock();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+</script>
+</body>
+</html>
